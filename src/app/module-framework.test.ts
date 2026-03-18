@@ -1,6 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { DIFFICULTIES } from "./module-framework";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { DIFFICULTIES, defineModule } from "./module-framework";
 import type { DifficultyDefinition } from "./module-framework";
+import { vstack } from "@canvas/nodes/container";
 
 describe("DIFFICULTIES Konstante", () => {
   it("hat genau 3 Einträge (Junior, Checker, BossBaby)", () => {
@@ -106,5 +107,182 @@ describe("defineModule Struktur (via Multiplication-Modul)", () => {
     expect(typeof lernModul.deactivate).toBe("function");
     expect(typeof lernModul.resize).toBe("function");
     expect(typeof lernModul.destroy).toBe("function");
+  });
+});
+
+// ─── Minimal helper: minimal module without DOM side-effects ────────────────
+
+function makeMinimalModule(opts: { input?: "numberPad" | "canvas" } = {}) {
+  return defineModule({
+    id: "test-module",
+    label: "Test",
+    icon: "🧪",
+    description: "Testmodul",
+    flowType: "explore",
+    taskTypes: [{ id: "default", label: "Standard" }],
+    input: opts.input,
+    generate: () => ({ value: 42 }),
+    buildScene: () => vstack([]),
+  }).factory();
+}
+
+// ─── Suite: mount() DOM-Erzeugung ───────────────────────────────────────────
+
+describe("defineModule — mount() DOM-Erzeugung", () => {
+  let container: HTMLDivElement;
+
+  beforeEach(() => {
+    container = document.createElement("div");
+    document.body.appendChild(container);
+  });
+
+  afterEach(() => {
+    container.remove();
+    vi.restoreAllMocks();
+  });
+
+  it("mount() erzeugt ein <canvas>-Element im Container", () => {
+    const mod = makeMinimalModule();
+    mod.mount(container);
+    expect(container.querySelector("canvas")).not.toBeNull();
+  });
+
+  it("mount() erzeugt eine control-bar", () => {
+    const mod = makeMinimalModule();
+    mod.mount(container);
+    expect(container.querySelector(".control-bar")).not.toBeNull();
+  });
+
+  it("mount() mit input: 'numberPad' erzeugt ein numpad-Panel", () => {
+    const mod = makeMinimalModule({ input: "numberPad" });
+    mod.mount(container);
+    expect(container.querySelector(".v2-numpad")).not.toBeNull();
+  });
+
+  it("mount() ohne numpad erzeugt kein sichtbares numpad-Panel", () => {
+    const mod = makeMinimalModule({ input: "canvas" });
+    mod.mount(container);
+    const numpad = container.querySelector(".v2-numpad") as HTMLElement | null;
+    const isHidden = !numpad || numpad.style.display === "none";
+    expect(isHidden).toBe(true);
+  });
+
+  it("canvas hat aria-label nach mount()", () => {
+    const mod = makeMinimalModule();
+    mod.mount(container);
+    const canvas = container.querySelector("canvas");
+    expect(canvas?.getAttribute("aria-label")).toBeTruthy();
+  });
+});
+
+// ─── Suite: Lifecycle mount → activate → deactivate → destroy ───────────────
+
+describe("defineModule — Lifecycle ohne Crash", () => {
+  let container: HTMLDivElement;
+
+  beforeEach(() => {
+    container = document.createElement("div");
+    document.body.appendChild(container);
+  });
+
+  afterEach(() => {
+    container.remove();
+    vi.restoreAllMocks();
+  });
+
+  it("activate() nach mount() wirft keinen Fehler", () => {
+    const mod = makeMinimalModule();
+    mod.mount(container);
+    expect(() => mod.activate()).not.toThrow();
+  });
+
+  it("deactivate() nach activate() wirft keinen Fehler", () => {
+    const mod = makeMinimalModule();
+    mod.mount(container);
+    mod.activate();
+    expect(() => mod.deactivate()).not.toThrow();
+  });
+
+  it("activate() → deactivate() → activate() Zyklus ohne Crash", () => {
+    const mod = makeMinimalModule();
+    mod.mount(container);
+    expect(() => {
+      mod.activate();
+      mod.deactivate();
+      mod.activate();
+      mod.deactivate();
+    }).not.toThrow();
+  });
+
+  it("destroy() nach deactivate() wirft keinen Fehler", () => {
+    const mod = makeMinimalModule();
+    mod.mount(container);
+    mod.activate();
+    mod.deactivate();
+    expect(() => mod.destroy()).not.toThrow();
+  });
+
+  it("resize() nach mount() wirft keinen Fehler", () => {
+    const mod = makeMinimalModule();
+    mod.mount(container);
+    expect(() => mod.resize()).not.toThrow();
+  });
+});
+
+// ─── Suite: autoAdvancePending Guard (Regressions-Test) ─────────────────────
+
+describe("defineModule — autoAdvancePending Guard", () => {
+  let container: HTMLDivElement;
+
+  beforeEach(() => {
+    container = document.createElement("div");
+    document.body.appendChild(container);
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    container.remove();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it("deactivate() vor rAF-Fire hinterlässt keinen globalen click-capture-Listener", async () => {
+    // Regression: if autoAdvancePending guard is missing, a stale rAF would add a
+    // capture-phase click listener after cancelAutoAdvance() was already called,
+    // causing subsequent canvas button taps to be swallowed.
+
+    const mod = defineModule({
+      id: "test-guard",
+      label: "Guard-Test",
+      icon: "🧪",
+      description: "Test",
+      flowType: "task",
+      taskTypes: [{ id: "default", label: "Standard" }],
+      autoAdvanceMs: 3000,
+      generate: () => ({ answer: 5 }),
+      check: (_task: { answer: number }, _input: unknown) => ({
+        correct: false,
+      }),
+      buildScene: () => vstack([]),
+    }).factory();
+
+    mod.mount(container);
+    mod.activate();
+
+    // Spy AFTER activate (to ignore the listeners activate itself adds)
+    const addEventSpy = vi.spyOn(document, "addEventListener");
+
+    // deactivate() calls cancelAutoAdvance() → sets autoAdvancePending = false
+    // AND stops the scene loop → no more rAFs scheduled
+    mod.deactivate();
+
+    // Advance timers 50ms (≈3 RAF slots at 16ms each) — should be safe since loop is stopped
+    await vi.advanceTimersByTimeAsync(50);
+
+    // The stale rAF from startAutoAdvance (if any) must NOT add a click-capture listener
+    const clickCaptureListeners = addEventSpy.mock.calls.filter(
+      ([event, , capture]) => event === "click" && capture === true,
+    );
+    expect(clickCaptureListeners).toHaveLength(0);
   });
 });

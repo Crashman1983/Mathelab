@@ -6,7 +6,7 @@
  */
 
 import { defineModule, DIFFICULTIES } from "@app/module-framework";
-import type { SceneContext, PointerContext, ModuleContext, TutorialStep } from "@app/module-framework";
+import type { SceneContext, ModuleContext, TutorialStep } from "@app/module-framework";
 import { vstack, hstack } from "@canvas/nodes/container";
 import { text } from "@canvas/nodes/text";
 import { button } from "@canvas/nodes/button";
@@ -18,12 +18,10 @@ import { gridKeyOf, gridParseKey } from "@core/utils";
 import {
   createGridInteraction,
   type GridInteraction,
-  type GridGeometry,
 } from "@canvas/interactions/grid-tap";
 import {
   computeExpected,
   checkAnswer,
-  isInSourceRegion,
   isInAnswerRegion,
   SYMMETRY_TASKS,
   generateProceduralCells,
@@ -244,7 +242,7 @@ function buildScene(ctx: SceneContext<SymmetryTaskDef, SymState>): CanvasNode {
   return vstack([
     text(`${MODE_LABELS[task.mode]}: ${task.label}`, { fontSize: "xl", bold: true }),
     text(
-      ctx.phase === "present" ? "Schau dir die Vorlage genau an." : "Male die fehlenden Felder aus.",
+      "Male die fehlenden Felder aus.",
       { fontSize: "sm", color: "canvasTextDim" },
     ),
     custom({

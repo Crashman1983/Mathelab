@@ -1,7 +1,7 @@
 /**
  * Tests fuer Crash Recovery (localStorage-Robustheit).
  */
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import {
   isLocalStorageAvailable,
   safeGet,

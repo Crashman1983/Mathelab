@@ -22,7 +22,6 @@ import {
   emptyCounts,
   addResults,
   runExperiment,
-  getLeaderIndex,
   theoreticalShare,
   actualShare,
   computeWheelTargetAngle,

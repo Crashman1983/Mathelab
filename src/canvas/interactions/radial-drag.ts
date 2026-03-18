@@ -42,7 +42,6 @@ export interface RadialDragTracker {
 export function createRadialDrag(config: RadialDragConfig): RadialDragTracker {
   const deadZone = config.deadZone ?? 0.25;
   let active = false;
-  let lastZone: string | null = null;
 
   function getAngleAndZone(x: number, y: number): { angle: number; zone: string | null } | null {
     const dx = x - config.cx;
@@ -82,7 +81,6 @@ export function createRadialDrag(config: RadialDragConfig): RadialDragTracker {
       const result = getAngleAndZone(x, y);
       if (!result) return false;
       active = true;
-      lastZone = result.zone;
       config.onAngleChange?.(result.angle, result.zone);
       return true;
     },
@@ -91,7 +89,6 @@ export function createRadialDrag(config: RadialDragConfig): RadialDragTracker {
       if (!active) return;
       const result = getAngleAndZone(x, y);
       if (!result) return;
-      lastZone = result.zone;
       config.onAngleChange?.(result.angle, result.zone);
     },
 

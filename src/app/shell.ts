@@ -13,7 +13,7 @@
 import type { LernModul, ModuleRegistration, AppState } from "@core/types";
 import { setColorMode } from "@core/design";
 import { appEvents } from "@core/events";
-import { safeGetLocalStorage, safeSetLocalStorage, debounce } from "@core/utils";
+import { safeSetLocalStorage, debounce } from "@core/utils";
 import { appState } from "@core/state";
 import { isTTSAvailable, isTTSEnabled, setTTSEnabled, speak } from "@core/tts";
 import { isMuted, setMuted } from "@core/sounds";
@@ -36,12 +36,10 @@ export class AppShell {
     },
   };
 
-  private containerEl: HTMLElement;
   private navEl: HTMLElement;
   private contentEl: HTMLElement;
 
   constructor() {
-    this.containerEl = document.getElementById("app") ?? document.body;
     this.navEl = document.getElementById("app-nav") as HTMLElement;
     this.contentEl = document.getElementById("app-content") as HTMLElement;
 
@@ -109,10 +107,9 @@ export class AppShell {
 
   // ─── URL Hash Router (Baustein 10) ───────────────────────────────────────
 
-  private cleanupRouter: (() => void) | null = null;
 
   private initRouter(): void {
-    this.cleanupRouter = onRouteChange((params) => {
+    onRouteChange((params) => {
       if (params && this.registrations.has(params.moduleId)) {
         this.activateModule(params.moduleId);
       } else {

@@ -8,12 +8,12 @@
  */
 
 import { defineModule, DIFFICULTIES, type SceneContext, type TutorialStep } from "@app/module-framework";
-import { vstack, hstack } from "@canvas/nodes/container";
+import { vstack } from "@canvas/nodes/container";
 import { text } from "@canvas/nodes/text";
 import { custom } from "@canvas/nodes/custom";
 import type { CanvasNode } from "@canvas/nodes/types";
 import { getPalette } from "@core/design";
-import { drawParchmentBg, drawCompassRose, drawTreasureX } from "@canvas/illustrations/treasure-map";
+import { drawParchmentBg, drawCompassRose } from "@canvas/illustrations/treasure-map";
 import {
   generatePlotTask,
   generateReadTask,
@@ -25,7 +25,6 @@ import {
   pointsEqual,
   checkPlotAnswer,
   checkReadAnswer,
-  type CoordsMode,
   type PlotTask,
   type ReadTask,
   type PathTask,
@@ -236,9 +235,8 @@ function drawCheckDot(
 }
 
 function buildScene(ctx: SceneContext<CoordTask, CoordState>): CanvasNode {
-  const { task, state, phase, result } = ctx;
+  const { task, state, result } = ctx;
   const isCorrect = result?.correct === true;
-  const isInteract = phase === "interact";
 
   switch (task.mode) {
     case "plot":
@@ -249,21 +247,12 @@ function buildScene(ctx: SceneContext<CoordTask, CoordState>): CanvasNode {
             : `Klicke auf (${task.data.target.x}|${task.data.target.y})`,
           { fontSize: "xl", bold: true },
         ),
-        ...(phase === "present"
-          ? [text("Drücke \"Starten\" und tippe dann auf den richtigen Punkt.", { fontSize: "sm", color: "canvasTextDim" })]
-          : []),
         custom({
           id: "grid-plot",
           flex: 1,
           draw(drawCtx, r) {
             const geo = drawGrid(drawCtx, r, 10);
             const palette = getPalette();
-
-            // Present mode: show treasure X at target position
-            if (phase === "present") {
-              const { cx: tx, cy: ty } = gridToCanvas(task.data.target, geo.originX, geo.originY, geo.cellSize);
-              drawTreasureX(drawCtx, tx, ty, geo.cellSize * 0.5, palette, 0.5);
-            }
 
             // Show placed point (student's tap) if it exists and not yet correct
             if (state.placedPoint && !isCorrect) {
@@ -284,11 +273,9 @@ function buildScene(ctx: SceneContext<CoordTask, CoordState>): CanvasNode {
         ...(isCorrect
           ? [text(`Richtig! (${task.data.point.x}|${task.data.point.y})`, { fontSize: "md", color: "ok" })]
           : []),
-        ...(phase === "present"
-          ? [text("Drücke \"Starten\" und gib die Koordinaten über die Tastatur ein.", { fontSize: "sm", color: "canvasTextDim" })]
-          : isInteract && !isCorrect
-            ? [text("Gib erst die x-Zahl ein, dann die y-Zahl. F\u00FCr den Punkt (3|5) tippst du 3, dann 5.", { fontSize: "sm", color: "canvasTextDim" })]
-            : []),
+        ...(!isCorrect
+          ? [text("Gib erst die x-Zahl ein, dann die y-Zahl. F\u00FCr den Punkt (3|5) tippst du 3, dann 5.", { fontSize: "sm", color: "canvasTextDim" })]
+          : []),
         custom({
           id: "grid-read",
           flex: 1,
@@ -319,9 +306,6 @@ function buildScene(ctx: SceneContext<CoordTask, CoordState>): CanvasNode {
             : `Punkt ${nextIdx + 1} von ${totalPts}: (${task.data.points[nextIdx]!.x}|${task.data.points[nextIdx]!.y})`,
           { fontSize: "sm", color: pathDone ? "ok" : "canvasTextDim" },
         ),
-        ...(phase === "present"
-          ? [text("Drücke \"Starten\" und tippe die Punkte der Reihe nach an.", { fontSize: "sm", color: "canvasTextDim" })]
-          : []),
         custom({
           id: "grid-path",
           flex: 1,

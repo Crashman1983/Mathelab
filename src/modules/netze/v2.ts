@@ -7,14 +7,14 @@
  */
 
 import { defineModule, DIFFICULTIES } from "@app/module-framework";
-import type { SceneContext, PointerContext, ModuleContext, TutorialStep } from "@app/module-framework";
+import type { SceneContext, ModuleContext, TutorialStep } from "@app/module-framework";
 import { vstack, hstack } from "@canvas/nodes/container";
 import { text } from "@canvas/nodes/text";
 import { button } from "@canvas/nodes/button";
 import { custom } from "@canvas/nodes/custom";
 import type { CanvasNode } from "@canvas/nodes/types";
 import { getPalette, EXPERIMENT_COLORS, resolveCanvasSpacing } from "@core/design";
-import { gridKeyOf, gridParseKey, prefersReducedMotion } from "@core/utils";
+import { gridKeyOf, prefersReducedMotion } from "@core/utils";
 import { playClickSound } from "@core/sounds";
 import {
   createGridInteraction,
@@ -28,7 +28,6 @@ import {
   analyzeNet,
   netTemplates,
   findOppositePairs,
-  computeCellFrames,
   type NetBody,
   type CellData,
   type CellKey,
@@ -571,9 +570,7 @@ function buildNetScene(ctx: SceneContext<NetTask, NetState>): CanvasNode {
 
   const statusText = result
     ? (result.correct ? "G\u00FCltiges Netz!" : (result.feedback ?? "Kein g\u00FCltiges Netz."))
-    : phase === "present"
-      ? `Vorlage: ${task.label}`
-      : `${analysis.faceCount}/6 Fl\u00E4chen \u00B7 ${analysis.connected ? "zusammenh\u00E4ngend" : "nicht zusammenh\u00E4ngend"}`;
+    : `${analysis.faceCount}/6 Fl\u00E4chen \u00B7 ${analysis.connected ? "zusammenh\u00E4ngend" : "nicht zusammenh\u00E4ngend"}`;
 
   const statusColor = result
     ? (result.correct ? "canvasSuccess" : "canvasError")
@@ -610,15 +607,14 @@ function buildNetScene(ctx: SceneContext<NetTask, NetState>): CanvasNode {
         drawCtx.textAlign = "center";
         drawCtx.textBaseline = "bottom";
         drawCtx.fillText(
-          phase === "present" ? "Vorlage" : "Netz bauen (tippen/ziehen)",
+          "Netz bauen (tippen/ziehen)",
           ox + totalW / 2,
           oy - sp.xs,
         );
 
         // Draw grid — always use state.cells from buildScene closure.
         // moduleCtx.state is stale (spread evaluates getter once at pointer-event time).
-        const templateForPresent = phase === "present" ? task.templateCells : null;
-        drawNetGrid(drawCtx, state.cells, templateForPresent, phase, ox, oy, cellSize);
+        drawNetGrid(drawCtx, state.cells, null, phase, ox, oy, cellSize);
 
         // Update grid interaction geometry
         if (gridInteraction) {
@@ -658,9 +654,7 @@ function buildNetScene(ctx: SceneContext<NetTask, NetState>): CanvasNode {
         drawCtx.fillText("3D-Vorschau (ziehen zum Drehen)", previewCx, r.y + sp.sm);
 
         // 3D preview cells — use state.cells from closure (same as grid)
-        const previewCells = phase === "present"
-          ? new Set(task.templateCells.keys())
-          : state.cells;
+        const previewCells = state.cells;
 
         // Clip 3D rendering to right half — safety net for extreme rotation angles
         drawCtx.save();
@@ -860,9 +854,6 @@ function buildOppositeScene(ctx: SceneContext<NetTask, NetState>): CanvasNode {
 }
 
 // ─── Predict Scene ──────────────────────────────────────────────────────────
-
-/** Callback ref for predict-mode tap on a face */
-let onPredictTapRef: ((key: CellKey) => void) | null = null;
 
 function buildPredictScene(ctx: SceneContext<NetTask, NetState>): CanvasNode {
   const { task, state, phase } = ctx;
@@ -1404,18 +1395,14 @@ export const netzeV2Registration = defineModule<NetTask, NetState>({
     moduleCtx = ctx;
     // Present phase: show finished cube with auto-rotation (teacher preview)
     // Interact phase: start flat for student to build
-    const isPresent = ctx.phase === "present";
     animState = {
-      fold: isPresent ? 1 : 0,
-      foldTarget: isPresent ? 1 : 0,
+      fold: 0,
+      foldTarget: 0,
       foldStart: 0,
       foldStartTime: 0,
       rotation: { x: -0.5, y: 0.6 },
-      autoSpin: isPresent,
+      autoSpin: false,
     };
-    if (isPresent && !prefersReducedMotion()) {
-      startAnimLoop();
-    }
 
     // Create grid interaction with paint mode for net building
     gridInteraction = createGridInteraction({
@@ -1432,8 +1419,6 @@ export const netzeV2Registration = defineModule<NetTask, NetState>({
 
       onCellDrag(col, row, mode) {
         if (!moduleCtx) return;
-        // Present phase is read-only — teacher shows, student watches
-        if (moduleCtx.phase === "present") return;
         playClickSound();
         const key = gridKeyOf(col, row);
         moduleCtx.updateState((s) => {

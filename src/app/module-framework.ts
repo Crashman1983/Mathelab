@@ -56,7 +56,7 @@ export interface SolutionDisplay {
   scene?: CanvasNode;
 }
 
-export interface TaskTypeDefinition<TTask = unknown> {
+export interface TaskTypeDefinition {
   /** Unique type id (e.g. "core", "swap", "division") */
   id: string;
   /** Display label for task-type chips */
@@ -119,7 +119,7 @@ export interface ModuleDefinition<TTask = unknown, TState = unknown> {
   flowType: "task" | "explore";
 
   // ─── Task Types ──────────────────────────────────────────────────────────
-  taskTypes?: TaskTypeDefinition<TTask>[];
+  taskTypes?: TaskTypeDefinition[];
 
   // ─── Difficulty ──────────────────────────────────────────────────────────
   difficulties?: DifficultyDefinition[];
@@ -338,7 +338,7 @@ export function defineModule<TTask, TState>(
       }
     }
 
-    function showModuleError(err: unknown): void {
+    function showModuleError(_err: unknown): void {
       if (errorOverlayEl || !container) return;
       const overlay = document.createElement("div");
       overlay.className = "module-error-overlay";
@@ -732,7 +732,6 @@ export function defineModule<TTask, TState>(
       for (const btn of numpadButtons) {
         const digit = btn.dataset.digit;
         if (digit === undefined) continue;
-        const d = Number(digit);
         // Dim digits that would make the number exceed the range
         const wouldBe = Number(state.input + digit);
         const tooLong = currentLen + 1 > maxDigits;
@@ -1014,8 +1013,6 @@ export function defineModule<TTask, TState>(
       speakIfEnabled(sol.text);
     };
 
-    let lastPressedNumpadBtn: HTMLButtonElement | null = null;
-
     const handleNumpadKey = (digit: string, sourceBtn?: HTMLButtonElement): void => {
       if (state.result?.correct) return;
       if (digit === "clear") {
@@ -1134,7 +1131,7 @@ export function defineModule<TTask, TState>(
         const grid = document.createElement("div");
         grid.className = "v2-numpad__grid";
         numpadButtons = [];
-        const keys = ["7","8","9","4","5","6","1","2","3","⌫","0","↵"];
+        const keys = ["1","2","3","4","5","6","7","8","9","⌫","0","↵"];
         for (const k of keys) {
           const btn = document.createElement("button");
           btn.type = "button";
@@ -1448,15 +1445,6 @@ export function defineModule<TTask, TState>(
         // IMPORTANT: Must be set up BEFORE onActivate so modules can attach extensions.
         if (import.meta.env.DEV && scene) {
           const currentScene = scene;
-          const syntheticEvent = (x: number, y: number): ScenePointerEvent => ({
-            x, y,
-            pointerId: 1,
-            pointerType: "mouse",
-            isPrimary: true,
-            pressure: 0.5,
-            button: 0,
-            target: currentScene.hitTest(x, y),
-          });
 
           window.__moduleTestAPI = {
             // State

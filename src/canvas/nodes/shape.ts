@@ -4,7 +4,7 @@
  */
 
 import { BaseNode } from "./base";
-import type { MeasuredSize, Rect, ShapeStyle, Size } from "./types";
+import type { MeasuredSize, ShapeStyle, Size } from "./types";
 import { getPalette } from "@core/design";
 
 export type ShapeType = "rect" | "circle" | "ellipse";

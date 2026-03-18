@@ -206,7 +206,6 @@ function buildPlaceScene(ctx: Ctx): CanvasNode {
   // Map typed input digits to place-value positions (left-to-right).
   // The student types the full number, and we show each digit in its
   // corresponding place-value box so the connection is visually clear.
-  const targetStr = String(task.target);
   const inputDigits: (string | null)[] = places.map(() => null);
   if (answered) {
     // Show correct digits
@@ -254,7 +253,7 @@ function buildPlaceScene(ctx: Ctx): CanvasNode {
         const digitY = r.y + r.h * 0.72;
 
         for (let i = 0; i < cols; i++) {
-          const [abbr, , digit] = places[i]!;
+          const [abbr] = places[i]!;
           const cx = startX + i * colW;
           const isActive = i === activeIndex && !answered;
           const isFilled = inputDigits[i] !== null;

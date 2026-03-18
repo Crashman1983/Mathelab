@@ -52,7 +52,7 @@ describe("TrackedContext", () => {
       tracked.proxy.fillText("tiny text", 100, 100);
 
       const violations = tracked.checkViolations();
-      const small = violations.filter(v => v.type === "text-too-small");
+      const small = violations.filter((v: { type: string }) => v.type === "text-too-small");
       expect(small.length).toBeGreaterThanOrEqual(1);
       expect(small[0]!.detail).toContain("tiny text");
     });
@@ -70,7 +70,7 @@ describe("TrackedContext", () => {
       tracked.proxy.fillText("normal text", 100, 100);
 
       const violations = tracked.checkViolations();
-      const small = violations.filter(v => v.type === "text-too-small");
+      const small = violations.filter((v: { type: string }) => v.type === "text-too-small");
       expect(small).toHaveLength(0);
     });
   });
@@ -94,7 +94,7 @@ describe("TrackedContext", () => {
       tracked.proxy.fillRect(80, 80, 100, 100);
 
       const violations = tracked.checkViolations();
-      const occluded = violations.filter(v => v.type === "text-occluded");
+      const occluded = violations.filter((v: { type: string }) => v.type === "text-occluded");
       expect(occluded.length).toBeGreaterThanOrEqual(1);
       expect(occluded[0]!.detail).toContain("occluded");
     });
@@ -116,7 +116,7 @@ describe("TrackedContext", () => {
       tracked.proxy.fillRect(500, 500, 100, 100);
 
       const violations = tracked.checkViolations();
-      const occluded = violations.filter(v => v.type === "text-occluded");
+      const occluded = violations.filter((v: { type: string }) => v.type === "text-occluded");
       expect(occluded).toHaveLength(0);
     });
   });
@@ -139,7 +139,7 @@ describe("TrackedContext", () => {
       tracked.proxy.fillText("Label B", 120, 100);
 
       const violations = tracked.checkViolations();
-      const overlaps = violations.filter(v => v.type === "custom-draw-overlap");
+      const overlaps = violations.filter((v: { type: string }) => v.type === "custom-draw-overlap");
       expect(overlaps.length).toBeGreaterThanOrEqual(1);
     });
   });

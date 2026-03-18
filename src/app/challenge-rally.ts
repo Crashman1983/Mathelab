@@ -18,7 +18,6 @@ import {
   getBestResult,
 } from "./challenge";
 import { appEvents } from "@core/events";
-import { appState } from "@core/state";
 import { playClickSound } from "@core/sounds";
 import { attachChallengeUI, updateChallengeContainer, dismissChallengeUI } from "./challenge-ui";
 
@@ -36,7 +35,6 @@ let rallyIndex = 0;
 let rallyShell: AppShell | null = null;
 let rallyErrors = 0;
 let rallyCleanup: (() => void) | null = null;
-let rallyOverlay: HTMLElement | null = null;
 
 /** Build the rally sequence: one step per module (first taskType) */
 function buildSequence(registrations: ModuleRegistration[]): RallyStep[] {
@@ -96,7 +94,6 @@ function showRallyConfig(): void {
     btn.addEventListener("click", () => {
       const sec = Number((btn as HTMLElement).dataset.seconds);
       overlay.remove();
-      rallyOverlay = null;
       playClickSound();
       beginRally(sec);
     });
@@ -104,17 +101,15 @@ function showRallyConfig(): void {
 
   card.querySelector(".challenge-cancel-btn")?.addEventListener("click", () => {
     overlay.remove();
-    rallyOverlay = null;
   });
 
   overlay.appendChild(card);
   overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) { overlay.remove(); rallyOverlay = null; }
+    if (e.target === overlay) { overlay.remove(); }
   });
 
   container.style.position = "relative";
   container.appendChild(overlay);
-  rallyOverlay = overlay;
 }
 
 // ─── Rally Execution ─────────────────────────────────────────────────────────

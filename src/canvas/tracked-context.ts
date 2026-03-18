@@ -126,6 +126,7 @@ export function createTrackedContext(
   proxy: CanvasRenderingContext2D;
   getRegions: () => DrawnRegion[];
   checkOverlaps: (tolerance?: number) => DrawOverlap[];
+  checkViolations: (tolerance?: number) => DrawViolationEntry[];
 } {
   const regions: DrawnRegion[] = [];
   let textCounter = 0;

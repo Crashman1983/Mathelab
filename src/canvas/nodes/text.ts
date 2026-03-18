@@ -5,7 +5,6 @@
 
 import { BaseNode } from "./base";
 import type {
-  CanvasNode,
   MeasuredSize,
   Rect,
   Size,
@@ -24,9 +23,6 @@ export class TextNode extends BaseNode {
   /** Measured text metrics (set during measure) */
   private textWidth = 0;
   private textHeight = 0;
-  /** The canvas width used for font resolution */
-  private lastCanvasWidth = 0;
-
   constructor(text: string, style: TextStyle = {}) {
     super();
     this.text = text;
@@ -35,7 +31,6 @@ export class TextNode extends BaseNode {
 
   measure(ctx: CanvasRenderingContext2D, available: Size): MeasuredSize {
     // Resolve font from canvas width (CSS pixels)
-    this.lastCanvasWidth = available.w;
     const fonts = resolveCanvasFonts(available.w);
     const sizeKey = this.style.fontSize ?? "md";
     const fontSizePx = fonts[sizeKey];

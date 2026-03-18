@@ -9,7 +9,7 @@
  */
 
 import { defineModule, DIFFICULTIES } from "@app/module-framework";
-import type { SceneContext, PointerContext, TutorialStep } from "@app/module-framework";
+import type { SceneContext, TutorialStep } from "@app/module-framework";
 import type { CanvasScene } from "@canvas/scene";
 import { vstack, hstack } from "@canvas/nodes/container";
 import { text } from "@canvas/nodes/text";
@@ -327,14 +327,6 @@ function drawCalendarGrid(
 
 // ─── Radial Drag Setup ────────────────────────────────────────────────────────
 
-function setupRadialDrag(
-  setState: (partial: Partial<TimeState>) => void,
-): void {
-  // Will be fully configured once we have clock center from drawing
-  // For now, create with dummy values — reconfigured in onPointerDown
-  radialDrag = null;
-}
-
 function ensureRadialDrag(
   setState: (partial: Partial<TimeState>) => void,
 ): RadialDragTracker | null {
@@ -397,7 +389,7 @@ function buildReadScene(
   state: TimeState,
   phase: "present" | "interact",
   result: { correct: boolean; feedback?: string } | null,
-  ctx: SceneContext<TimeTask, TimeState>,
+  _ctx: SceneContext<TimeTask, TimeState>,
 ): CanvasNode {
   const isPresent = phase === "present";
   const answered = result !== null;
@@ -467,9 +459,9 @@ function buildReadScene(
 function buildSetScene(
   task: { mode: "set"; time: TimeOfDay },
   state: TimeState,
-  phase: "present" | "interact",
+  _phase: "present" | "interact",
   result: { correct: boolean; feedback?: string } | null,
-  ctx: SceneContext<TimeTask, TimeState>,
+  _ctx: SceneContext<TimeTask, TimeState>,
 ): CanvasNode {
   const answered = result !== null;
   const children: CanvasNode[] = [];
@@ -523,7 +515,7 @@ function buildTimespanScene(
   state: TimeState,
   phase: "present" | "interact",
   result: { correct: boolean; feedback?: string } | null,
-  ctx: SceneContext<TimeTask, TimeState>,
+  _ctx: SceneContext<TimeTask, TimeState>,
 ): CanvasNode {
   const isPresent = phase === "present";
   const answered = result !== null;
@@ -622,7 +614,7 @@ function buildCalendarScene(
   state: TimeState,
   phase: "present" | "interact",
   result: { correct: boolean; feedback?: string } | null,
-  ctx: SceneContext<TimeTask, TimeState>,
+  _ctx: SceneContext<TimeTask, TimeState>,
 ): CanvasNode {
   const isPresent = phase === "present";
   const answered = result !== null;

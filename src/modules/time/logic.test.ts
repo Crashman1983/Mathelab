@@ -31,7 +31,7 @@ import {
   generateTimespanTask,
   generateCalendarTask,
 } from "./logic";
-import type { TimeOfDay, CalendarDate, TimespanTask } from "./logic";
+import type { CalendarDate, TimespanTask } from "./logic";
 
 // ─── formatTime ───────────────────────────────────────────────────────────────
 

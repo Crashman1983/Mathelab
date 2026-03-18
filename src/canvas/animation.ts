@@ -201,10 +201,7 @@ export function morphNumber(
 export function drawLine(
   opts: AnimationOptions,
 ): AnimationHandle {
-  let currentProgress = 0;
-  return animateTo(0, 1, opts, (v) => {
-    currentProgress = v;
-  });
+  return animateTo(0, 1, opts, (_v) => {});
 }
 
 // ─── Primitive 5: sequence ───────────────────────────────────────────────────

@@ -132,7 +132,7 @@ describe("ButtonNode", () => {
     it("rendert disabled-Button mit panelSoft-Hintergrund", () => {
       const ctx = mockCtx();
       const fillStyles: string[] = [];
-      const origFillDescriptor = Object.getOwnPropertyDescriptor(ctx, "fillStyle");
+      Object.getOwnPropertyDescriptor(ctx, "fillStyle");
       let _fillStyle = ctx.fillStyle as string;
       Object.defineProperty(ctx, "fillStyle", {
         get: () => _fillStyle,

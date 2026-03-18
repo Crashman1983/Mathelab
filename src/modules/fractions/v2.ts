@@ -27,7 +27,6 @@ import {
   fractionValue,
   formatFraction,
   fractionName,
-  type FractionsMode,
   type Fraction,
   type CircleTask,
   type CompareTask,
@@ -60,7 +59,6 @@ let currentDifficulty = 1;
 let stateUpdater: ((fn: (s: FractionState) => FractionState) => void) | null = null;
 /** Advanced mode: tracks two-step input phase at module level (check() has no state access) */
 let advancedInputPhase: "numerator" | "denominator" = "numerator";
-let advancedEnteredNum: number | null = null;
 
 // ─── Module-level Sektor-Animations-State ────────────────────────────────────
 
@@ -376,9 +374,7 @@ function buildNumberLineScene(ctx: Ctx): CanvasNode {
     text(
       phase === "interact" && !answered
         ? "Tippe auf den Zahlenstrahl!"
-        : phase === "present"
-          ? "Schau dir den Zahlenstrahl an."
-          : "",
+        : "",
       { fontSize: "sm", color: "canvasTextDim" },
     ),
     custom({
@@ -691,7 +687,6 @@ export const fractionsV2Registration = defineModule<FractionTask, FractionState>
     const d = ctx.difficulty ?? 1;
     currentDifficulty = d; // Capture for scene builders + check()
     advancedInputPhase = "numerator"; // Reset two-step input for new task
-    advancedEnteredNum = null;
     const useProcedural = Math.random() < 0.5;
 
     switch (ctx.taskType) {
@@ -746,7 +741,6 @@ export const fractionsV2Registration = defineModule<FractionTask, FractionState>
         if (num === task.data.fraction.num) {
           // Numerator correct — advance to denominator phase
           advancedInputPhase = "denominator";
-          advancedEnteredNum = num;
           stateUpdater?.(s => ({ ...s, inputPhase: "denominator", enteredNum: num }));
           return { correct: false, feedback: "Zähler richtig! Jetzt den Nenner eingeben.", continueInput: true };
         }
@@ -756,7 +750,6 @@ export const fractionsV2Registration = defineModule<FractionTask, FractionState>
       if (num === task.data.fraction.den) {
         // Both correct!
         advancedInputPhase = "numerator"; // Reset for next task
-        advancedEnteredNum = null;
         stateUpdater?.(s => ({ ...s, inputPhase: "numerator", enteredNum: null }));
         return { correct: true, feedback: `Richtig! ${formatFraction(task.data.fraction)}` };
       }
@@ -833,7 +826,6 @@ export const fractionsV2Registration = defineModule<FractionTask, FractionState>
     nlSubmitCallback = null;
     stateUpdater = null;
     advancedInputPhase = "numerator";
-    advancedEnteredNum = null;
     cancelAnimationFrame(sectorAnimRafId);
     sectorAnimProgress = 0;
     sectorLastTime = null;
@@ -850,9 +842,6 @@ export const fractionsV2Registration = defineModule<FractionTask, FractionState>
     // We need to determine if the tap is on the number line area.
     // The custom node with id "numberline" occupies the flex area.
     // Use canvas dimensions to approximate the number line geometry.
-    const canvasW = ctx.x; // x is in CSS pixels relative to canvas
-    const canvasH = ctx.y;
-
     // Approximate the number line rect (the custom node takes the middle area)
     // The vstack has gap=8, padding=12, so the custom node starts after title+subtitle
     // We use a generous vertical hit zone around the line center

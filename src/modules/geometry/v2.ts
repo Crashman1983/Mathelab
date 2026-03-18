@@ -9,7 +9,7 @@
  */
 
 import { defineModule, DIFFICULTIES, type SceneContext, type ModuleContext, type TutorialStep } from "@app/module-framework";
-import { vstack, hstack, zstack } from "@canvas/nodes/container";
+import { vstack, hstack } from "@canvas/nodes/container";
 import { text } from "@canvas/nodes/text";
 import { button } from "@canvas/nodes/button";
 import { custom } from "@canvas/nodes/custom";
@@ -21,11 +21,9 @@ import {
   getShapes,
   generateAngleQuestion,
   generateAreaTask,
-  classifyAngle,
   angleLabel,
   explainAngle,
   explainArea,
-  type GeometryMode,
   type ShapeDef,
   type AngleQuestion,
   type AreaTask,
@@ -214,7 +212,7 @@ function buildShapesScene(
   const descriptionLabel = answered
     ? text(task.shape.description, { fontSize: "sm", color: "canvasTextDim" })
     : text(
-        ctx.phase === "present" ? "Schau dir die Form genau an." : "Tippe auf die richtige Antwort.",
+        "Tippe auf die richtige Antwort.",
         { fontSize: "sm", color: "canvasTextDim" },
       );
 
@@ -530,9 +528,7 @@ function buildAreaScene(
   return vstack([
     text("Zähle die Kästchen und berechne die Fläche", { fontSize: "xl", bold: true }),
     text(
-      ctx.phase === "present"
-        ? "Schau dir die Form genau an."
-        : "Tippe Kästchen an zum Zählen, dann gib die Fläche ein.",
+      "Tippe Kästchen an zum Zählen, dann gib die Fläche ein.",
       { fontSize: "sm", color: "canvasTextDim" },
     ),
     areaGrid,

@@ -174,7 +174,7 @@ class AppStateManager {
 
   // ── Convenience: Challenge History ─────────────────────────────────────────
 
-  getChallengeHistory(): StateSchema["challengeHistory"] & [] {
+  getChallengeHistory(): NonNullable<StateSchema["challengeHistory"]> {
     return this.data.challengeHistory ?? [];
   }
 

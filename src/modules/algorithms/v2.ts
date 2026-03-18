@@ -127,7 +127,6 @@ function buildDivisionScene(ctx: Ctx): CanvasNode {
   const entered = state.enteredDigits;
   // For division, focusCol indexes from LEFT (0 = first quotient digit)
   const focusCol = state.focusCol;
-  const restText = task.remainder ? ` R ${task.remainder}` : "";
 
   return vstack([
     text(`${task.a} : ${task.b} = ?`, { fontSize: "xl", bold: true }),
@@ -880,8 +879,6 @@ export const algorithmsV2Registration = defineModule<AlgoTask, AlgoState>({
 
       // Add/Sub/Mult: right-to-left entry
       const places = Math.max(numPlaces(task.a), numPlaces(task.b), numPlaces(task.answer));
-      const digitsR = getDigits(task.answer, places + 1);
-
       const newEntered = { ...ctx.state.enteredDigits, [col]: digit };
 
       // Auto-advance focus to next empty column

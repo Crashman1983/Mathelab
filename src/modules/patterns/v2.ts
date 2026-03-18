@@ -80,8 +80,8 @@ function buildSequenceScene(ctx: Ctx): CanvasNode {
 
   return vstack([
     text("Finde die fehlende Zahl", { fontSize: "xl", bold: true }),
-    // Regel nur in present-Phase zeigen (Lehrer erklärt) — im interact-Modus soll das Kind sie selbst entdecken
-    ...(ctx.phase === "present" || answered
+    // Regel nur nach Beantworten zeigen — im interact-Modus soll das Kind sie selbst entdecken
+    ...(answered
       ? [text(`Regel: ${task.data.ruleLabel}`, { fontSize: "sm", color: "canvasTextDim" })]
       : [text("Erkennst du die Regel?", { fontSize: "sm", color: "canvasTextDim" })]),
     custom({
@@ -152,8 +152,8 @@ function buildMachineScene(ctx: Ctx): CanvasNode {
 
   return vstack([
     text("Funktionsmaschine", { fontSize: "xl", bold: true }),
-    // Regel nur in present-Phase zeigen — im interact-Modus entdeckendes Lernen
-    ...(ctx.phase === "present" || answered
+    // Regel nur nach Beantworten zeigen — im interact-Modus entdeckendes Lernen
+    ...(answered
       ? [text(`Regel: ${getRuleLabel(task.data.rule, task.data.ruleValue)}`, { fontSize: "sm", color: "canvasTextDim" })]
       : [text("Was macht die Maschine?", { fontSize: "sm", color: "canvasTextDim" })]),
     custom({

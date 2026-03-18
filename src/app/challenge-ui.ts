@@ -13,7 +13,6 @@ import {
   cancelChallenge,
   getBestResult,
   formatTime,
-  isChallengeActive,
 } from "./challenge";
 import { playClickSound } from "@core/sounds";
 import { appState } from "@core/state";
@@ -106,7 +105,7 @@ function handleStateChange(state: ChallengeState): void {
 
 // ─── Config UI (Time Selection) ──────────────────────────────────────────────
 
-function showConfigUI(state: ChallengeState): void {
+function showConfigUI(_state: ChallengeState): void {
   if (configOverlayEl) return;
 
   const overlay = document.createElement("div");

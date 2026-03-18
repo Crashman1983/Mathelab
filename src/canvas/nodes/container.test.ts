@@ -6,7 +6,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { VStack, HStack, ZStack, GridNode, Spacer, vstack, hstack, grid, spacer } from "./container";
 import { BaseNode } from "./base";
-import type { CanvasNode, MeasuredSize, Rect, Size } from "./types";
+import type { MeasuredSize, Rect, Size } from "./types";
 
 // ─── Mock Node (fixed size) ─────────────────────────────────────────────────
 

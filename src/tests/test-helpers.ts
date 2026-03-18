@@ -4,7 +4,7 @@
  */
 import { vi } from "vitest";
 import { BaseNode } from "@canvas/nodes/base";
-import type { CanvasNode, MeasuredSize, Rect, Size } from "@canvas/nodes/types";
+import type { MeasuredSize, Rect, Size } from "@canvas/nodes/types";
 
 // ─── Mock Node (feste Größe) ────────────────────────────────────────────────
 

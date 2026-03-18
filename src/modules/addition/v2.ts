@@ -13,7 +13,7 @@
 
 import { defineModule, DIFFICULTIES } from "@app/module-framework";
 import type { SceneContext, TutorialStep } from "@app/module-framework";
-import { vstack, hstack } from "@canvas/nodes/container";
+import { vstack } from "@canvas/nodes/container";
 import { text } from "@canvas/nodes/text";
 import { custom } from "@canvas/nodes/custom";
 import type { CanvasNode } from "@canvas/nodes/types";
@@ -99,7 +99,7 @@ function drawFrog(
 // ─── Number Line Scene ────────────────────────────────────────────────────────
 
 function buildNumberLineScene(ctx: Ctx): CanvasNode {
-  const { task, input, result, state } = ctx;
+  const { task, input, result } = ctx;
   const positions = getJumpPositions(task);
   const { min, max } = getNumberLineRange(task);
   const answered = result?.correct === true;
@@ -602,9 +602,8 @@ export const additionV2Registration = defineModule<AddTask, AddState>({
   initialState: () => ({}),
 
   onActivate(ctx) {
-    // Present-Phase: Bögen sofort vollständig sichtbar zeigen
     // Interact-Phase: Animation von 0→1 abspielen
-    addAnimProgress = ctx.phase === "present" ? 1 : (prefersReducedMotion() ? 1 : 0);
+    addAnimProgress = prefersReducedMotion() ? 1 : 0;
     addPrevPhase = ctx.phase;
     addLastTime = null;
 

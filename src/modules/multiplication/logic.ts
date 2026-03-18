@@ -67,7 +67,7 @@ export function buildDotField(a: number, b: number): boolean[][] {
 }
 
 /** Überprüft ob ein Punkt im Feld hervorgehoben werden soll (für Animation) */
-export function isHighlighted(row: number, col: number, revealedRows: number): boolean {
+export function isHighlighted(row: number, _col: number, revealedRows: number): boolean {
   return row < revealedRows;
 }
 

@@ -279,7 +279,7 @@ export class CelebrationEffect {
     }
   }
 
-  private tickFirework(dt: number, progress: number): void {
+  private tickFirework(dt: number, _progress: number): void {
     for (const p of this.particles) {
       const delay = p.phase ?? 0;
       const localElapsed = this.elapsed - delay;
@@ -298,7 +298,7 @@ export class CelebrationEffect {
     }
   }
 
-  private tickGlitter(_dt: number, progress: number): void {
+  private tickGlitter(_dt: number, _progress: number): void {
     for (const p of this.particles) {
       const delay = p.phase ?? 0;
       const localElapsed = this.elapsed - delay;

@@ -7,14 +7,13 @@
 
 import { defineModule, DIFFICULTIES } from "@app/module-framework";
 import type { SceneContext, TutorialStep } from "@app/module-framework";
-import { vstack, hstack, spacer } from "@canvas/nodes/container";
+import { vstack, hstack } from "@canvas/nodes/container";
 import { text } from "@canvas/nodes/text";
 import { button } from "@canvas/nodes/button";
 import { custom } from "@canvas/nodes/custom";
 import { panel } from "@canvas/nodes/panel";
 import type { CanvasNode } from "@canvas/nodes/types";
-import { getPalette, resolveCanvasFonts, resolveCanvasSpacing } from "@core/design";
-import { drawMarketAwning } from "@canvas/illustrations/market";
+import { getPalette, resolveCanvasFonts } from "@core/design";
 import {
   generateMoneyTask,
   generateUnitsTask,
@@ -424,16 +423,6 @@ function buildChangeIllustration(d: MoneyTaskData, answered: boolean): CanvasNod
     changeContent,
   );
 
-  // ── Market awning decoration ──
-  const awning = custom({
-    id: "market-awning",
-    h: 24,
-    draw(c, r) {
-      const palette = getPalette();
-      drawMarketAwning(c, r.x, r.y, r.w, 24, palette, 0.1);
-    },
-  });
-
   // ── Full change illustration (clean receipt layout) ──
   return panel(
     {
@@ -454,9 +443,8 @@ function buildChangeIllustration(d: MoneyTaskData, answered: boolean): CanvasNod
 // ─── Scene Builders ─────────────────────────────────────────────────────────
 
 function buildMoneyScene(ctx: Ctx): CanvasNode {
-  const { task, state, result, phase } = ctx;
+  const { task, state, result } = ctx;
   if (task.mode !== "money") return text("Fehler", { fontSize: "lg" });
-  const isInteract = phase === "interact";
 
   const d = task.data;
   const answered = result?.correct === true;
@@ -589,7 +577,7 @@ function buildMoneyScene(ctx: Ctx): CanvasNode {
 }
 
 function buildUnitsScene(ctx: Ctx): CanvasNode {
-  const { task, input, result, state } = ctx;
+  const { task, input, result } = ctx;
   if (task.mode !== "units") return text("Fehler", { fontSize: "lg" });
 
   const { data, pair } = task;

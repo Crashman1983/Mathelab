@@ -672,7 +672,6 @@ export const multiplicationV2Registration = defineModule<MultiTask, MultiState>(
           const cellW = dotR * 3;
           const cellH = dotR * 3;
           const fieldW = cols * cellW;
-          const fieldH = rows * cellH;
           const fx = (w - fieldW) / 2;
           const fy = h * 0.3;
 

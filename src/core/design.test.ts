@@ -6,7 +6,7 @@ import {
   getPalette, setColorMode, getColorMode, resolveCanvasFonts,
   resolveCanvasSpacing, resolveCanvasRadius,
   TYPOGRAPHY, SPACING, RADIUS, ANIMATION, BREAKPOINTS,
-  EXPERIMENT_COLORS, PLACE_VALUE_COLORS, CLOCK_COLORS, COIN_COLORS, DICE_COLORS,
+  EXPERIMENT_COLORS, PLACE_VALUE_COLORS, CLOCK_COLORS, DICE_COLORS,
   getStatusColor, getStatusBgColor,
   type ColorPalette,
 } from "./design";
