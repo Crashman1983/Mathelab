@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Test, Build & Deploy to GitHub Pages
 
 on:
   push:
@@ -15,8 +15,10 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+# ─── Job 1: Tests ────────────────────────────────────────────────────────────
 jobs:
-  build:
+  test:
+    name: Typecheck & Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,13 +30,51 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run build
+      - name: TypeScript-Typen prüfen
+        run: npm run typecheck
+
+      - name: Tests ausführen (1063 Tests)
+        run: npm test
+
+# ─── Job 2: Build ────────────────────────────────────────────────────────────
+  build:
+    name: Build (Single-File + PWA)
+    needs: test  # Nur wenn alle Tests grün
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Single-File Build → dist/
+        run: npm run build
+
+      - name: PWA Build → dist-pwa/
+        run: npm run build:pwa
+        env:
+          # Base-URL für GitHub Pages: /Mathelab/pwa/
+          VITE_BASE_URL: /Mathelab/pwa/
+
+      - name: Ausgaben zusammenführen → _site/
+        run: |
+          mkdir -p _site/pwa
+          # Single-File HTML → Root
+          cp dist/index.html _site/index.html
+          # PWA → Unterverzeichnis /pwa/
+          cp -r dist-pwa/. _site/pwa/
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: _site
 
+# ─── Job 3: Deploy ───────────────────────────────────────────────────────────
   deploy:
+    name: Deploy to GitHub Pages
     needs: build
     runs-on: ubuntu-latest
     environment:
