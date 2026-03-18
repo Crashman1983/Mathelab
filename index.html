@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mathewerkstatt Bayern 3/4</title>
+  <meta name="description" content="Mathewerkstatt Bayern 3/4 – Interaktive Mathematik-Lernumgebung für die Grundschule" />
+  <meta name="theme-color" content="#0F1B2D" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <!-- Offline-Nutzung: Diese Datei lokal speichern (Strg+S / Cmd+S). Alle Ressourcen sind inline – kein Netzwerk nötig. -->
+  <!-- Schriftarten: Atkinson Hyperlegible (Legasthenie-optimiert) ist inline eingebettet (fonts.css).
+       Kein CDN nötig — funktioniert vollständig offline. -->
+</head>
+<body>
+  <div id="app" class="app-shell">
+
+    <!-- Top Bar -->
+    <header class="app-topbar" role="banner">
+      <button id="topbar-home" class="app-topbar__title" type="button" aria-label="Startseite" title="Startseite (Alt+0)" style="cursor:pointer;background:none;border:none;color:inherit;font:inherit;padding:0;min-height:48px">🔢 Mathewerkstatt</button>
+      <button id="topbar-module-label" class="app-topbar__module" type="button" aria-label="Modul-Auswahl öffnen" aria-live="polite" hidden style="cursor:pointer;background:none;border:none;color:inherit;font:inherit;padding:4px 12px;border-radius:var(--radius-sm);min-height:44px"></button>
+      <div id="topbar-chips" class="topbar-chips" hidden></div>
+      <div class="app-topbar__spacer"></div>
+      <div id="session-stats" class="session-stats" aria-live="polite"></div>
+      <!-- Text-to-Speech: liest aktuellen Aufgabentext vor (Web Speech API) -->
+      <button id="tts-toggle" class="btn btn--ghost btn--sm topbar-icon-btn" type="button"
+        aria-label="Vorlesen ein/aus" title="Vorlesen ein/aus" aria-pressed="false">🔊</button>
+      <button id="sound-toggle" class="btn btn--ghost btn--sm topbar-icon-btn" type="button"
+        aria-label="Töne ein/aus" title="Töne ein/aus" aria-pressed="false">🔔</button>
+      <button id="theme-toggle" class="btn btn--ghost btn--sm topbar-icon-btn" type="button"
+        aria-label="Hell/Dunkel-Modus wechseln" title="Hell/Dunkel-Modus">☀️</button>
+    </header>
+
+    <!-- Main Area -->
+    <div class="app-content" role="main">
+
+      <!-- Backdrop (closes nav on outside click) -->
+      <div id="nav-backdrop" class="nav-backdrop" aria-hidden="true"></div>
+
+      <!-- Navigation Sidebar (overlay drawer) -->
+      <nav id="app-nav" class="app-nav" role="navigation" aria-label="Module">
+        <!-- Home Button -->
+        <button class="nav-item active" data-module-id="home" type="button" id="nav-home" aria-label="Startseite">
+          <span class="nav-item__icon" aria-hidden="true">🏠</span>
+          <span class="nav-item__label">Startseite</span>
+        </button>
+        <!-- Module nav items are added dynamically by AppShell -->
+        <div id="nav-spacer" style="flex:1"></div>
+        <!-- Keyboard hint (hidden on mobile) -->
+        <div id="nav-keyboard-hint" class="hint-box" style="font-size:0.72rem;opacity:0.7">
+          Alt+1–7: Modul wechseln
+        </div>
+      </nav>
+
+      <!-- Content Area (views rendered here, fills full width since nav is overlay) -->
+      <div id="app-content" style="overflow:hidden;height:100%;width:100%">
+
+        <!-- Home View (static) -->
+        <section class="view active" id="view-home" aria-label="Startseite">
+          <div class="home-view">
+            <div class="home-view__hero">
+              <div class="home-view__title">Mathewerkstatt Bayern 3/4</div>
+              <div class="home-view__subtitle">Interaktive Mathematik für die Grundschule</div>
+            </div>
+            <div class="module-cards" id="home-module-cards">
+              <!-- Cards added dynamically -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Module views are added dynamically by AppShell -->
+
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

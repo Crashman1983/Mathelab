@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "mathelabor-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "5174"],
+      "port": 5174
+    },
+    {
+      "name": "legacy-server",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-p", "5175", "/Users/sg/Documents/GitHub/Website-SGIT"],
+      "port": 5175
+    }
+  ]
+}

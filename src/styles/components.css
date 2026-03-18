@@ -1,0 +1,2362 @@
+/* =========================================================
+   Wiederverwendbare UI-Komponenten
+   KEINE Modul-spezifischen Styles hier.
+   ========================================================= */
+
+/* ── App Layout ────────────────────────────────────────── */
+
+.app-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.app-topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0 var(--space-lg);
+  background: rgba(0, 0, 0, 0.32);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  flex-shrink: 0;
+  z-index: 100; /* topbar */
+  min-height: clamp(56px, 3.6vw, 80px);
+  position: relative;
+}
+
+/* Dezenter Akzent-Leuchtstreifen am unteren Rand */
+.app-topbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent-border) 20%,
+    var(--accent-border) 80%,
+    transparent 100%
+  );
+  opacity: 0.6;
+}
+
+.app-topbar__title {
+  font-size: var(--font-panel-title);
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+.app-topbar__spacer {
+  flex: 1;
+}
+
+/* Task-type chips rendered inside topbar */
+.topbar-chips {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-left: var(--space-sm);
+  min-width: 0;
+  flex-shrink: 1;
+}
+.topbar-chips::-webkit-scrollbar { display: none; }
+
+/* Fade hint when chips overflow (scrollable indicator) */
+.topbar-chips {
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+  mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+}
+/* Remove fade when fully scrolled or no overflow (handled via JS class if needed) */
+@media (min-width: 1400px) {
+  .topbar-chips {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+.app-topbar__module {
+  font-size: var(--font-small);
+  font-weight: 500;
+  color: var(--text-dim);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.app-topbar__module::before {
+  content: "›";
+  opacity: 0.45;
+  font-weight: 400;
+  margin-right: var(--space-xs);
+}
+
+/* Topbar-Icon-Buttons (TTS, Theme-Toggle): quadratisch, klares Touch-Target */
+.topbar-icon-btn {
+  min-width: 48px !important;
+  min-height: 48px !important;
+  padding: 0 !important;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm) !important;
+}
+
+/* TTS aktiv: visuelles Feedback via aria-pressed="true" */
+.topbar-icon-btn[aria-pressed="true"] {
+  background: var(--accent-active) !important;
+  color: var(--accent) !important;
+  border-color: var(--accent-border) !important;
+}
+
+/* Light Mode */
+body.light-mode .app-topbar {
+  background: rgba(240, 244, 250, 0.88);
+}
+
+body.light-mode .app-nav {
+  background: rgba(255, 255, 255, 0.98);
+}
+
+body.light-mode .status-box {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+body.light-mode .mode-switcher {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+body.light-mode .btn--primary {
+  box-shadow: 0 2px 8px rgba(26, 107, 196, 0.20);
+}
+body.light-mode .btn--primary:hover {
+  box-shadow: 0 4px 16px rgba(26, 107, 196, 0.28);
+}
+
+.app-content {
+  /* V2 Layout: Einspaltiges Vollbreite-Layout — kein Sidebar-Panel.
+     Navigation über Overlay-Modal (Modul-Label in Topbar). */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+  min-width: 0; /* Flex-Item muss unter Content-Size schrumpfen können */
+}
+
+/* ── Hamburger-Toggle: entfernt (Kinder-MUST: persistente Navigation) ── */
+/* Der #nav-toggle Button ist im HTML nicht mehr vorhanden.                 */
+/* Falls er durch alten Code noch existiert, verstecken:                   */
+.nav-toggle-btn {
+  display: none !important;
+}
+
+/* ── Navigation Sidebar ──────────────────────────────────
+   V2: Sidebar ist ausgeblendet. Navigation über Overlay-Modal
+   (Modul-Label in Topbar öffnet Overlay, CLAUDE.md: kein Sidebar-Panel).
+   ────────────────────────────────────────────────────── */
+
+.app-nav {
+  display: none !important;
+}
+
+/* Backdrop wird nicht mehr benötigt (kein Overlay) */
+.nav-backdrop {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* V2: Sidebar-Breakpoints entfernt — Sidebar ist hidden.
+   Smartboard-Topbar bleibt: */
+
+/* Board (≥2200px): larger topbar for smartboard visibility at 4-5m */
+@media (min-width: 2200px) {
+  .app-topbar {
+    min-height: 64px;
+    gap: var(--space-md);
+    padding: 0 var(--space-xl);
+  }
+  .topbar-icon-btn {
+    min-width: 56px !important;
+    min-height: 56px !important;
+    font-size: 1.5rem;
+  }
+}
+
+/* Massive (≥3400px): topbar for 85" smartboard at 6-7m */
+@media (min-width: 3400px) {
+  .app-topbar {
+    min-height: 80px;
+    gap: var(--space-lg);
+  }
+  .topbar-icon-btn {
+    min-width: 64px !important;
+    min-height: 64px !important;
+    font-size: 1.75rem;
+  }
+}
+
+/* ── Nav-Items ──────────────────────────────────────── */
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Icon zentriert im icon-only Modus */
+  gap: var(--space-md);
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-body);
+  font-weight: 500;
+  color: var(--text-dim);
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    color var(--duration-fast) var(--ease-default);
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  /* MUST: 48×48 Touch-Target für Kinder */
+  min-height: 48px;
+  min-width: 48px;
+}
+
+.nav-item:hover {
+  background: var(--accent-subtle);
+  color: var(--text);
+}
+
+.nav-item.active {
+  background: var(--accent-active);
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+.nav-item__icon {
+  font-size: 1.4em;
+  flex-shrink: 0;
+  /* Im icon-only-Modus ist das Icon allein das Label */
+  width: 1.5em;
+  text-align: center;
+}
+
+/* Labels im icon-only-Modus ausblenden */
+.nav-item__label {
+  display: none;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--font-small);
+}
+
+/* Keyboard-Hint im icon-only-Modus ausblenden */
+#nav-keyboard-hint {
+  display: none;
+}
+
+/* ── Vollansicht ab 1100px: Labels anzeigen ──────────── */
+@media (min-width: 1100px) {
+  .nav-item {
+    justify-content: flex-start; /* Linksbündig mit Icon + Text */
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .nav-item:hover {
+    transform: translateX(2px);
+    transition:
+      background var(--duration-fast) var(--ease-default),
+      color var(--duration-fast) var(--ease-default),
+      transform var(--duration-fast) var(--ease-default);
+  }
+
+  .nav-item__label {
+    display: block;
+  }
+
+  #nav-keyboard-hint {
+    display: block;
+    font-size: var(--font-micro);
+    opacity: 0.7;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-item:hover {
+      transform: none;
+    }
+  }
+}
+
+/* ── Tablet 600–1099px: Kurz-Label unterhalb Icon ─────────────────────────
+   Kinder (8–10 J.) brauchen kombinierte Icon+Text-Navigation (CLAUDE.md).
+   64px → 90px Sidebar; Labels sind UI-Chrome, kein Fließtext (kein 18px-MUST).
+   ────────────────────────────────────────────────────────────────────────── */
+@media (min-width: 600px) and (max-width: 1099px) {
+  .app-nav {
+    width: 90px;
+  }
+
+  .nav-item {
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-xs);
+    justify-content: center;
+    min-height: 56px; /* leicht erhöht für 2-zeiliges Icon+Label-Layout */
+  }
+
+  .nav-item__icon {
+    font-size: 1.5em;
+    width: auto;
+  }
+
+  .nav-item__label {
+    display: block;
+    font-size: var(--font-micro);
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 8px);
+    opacity: 0.8;
+  }
+
+  .nav-item.active .nav-item__label {
+    opacity: 1;
+    font-weight: 700;
+  }
+}
+
+/* Content-Area: nimmt den verbleibenden Platz neben der Sidebar ein */
+#app-content {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* ── Module Layout (two-column) ─────────────────────────── */
+
+.module-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  overflow: hidden;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* MacBook Air 13" / 14" (1100–1399px) */
+@media (min-width: 1100px) {
+  .module-layout {
+    grid-template-columns: 320px 1fr;
+    gap: var(--space-xl);
+    padding: var(--space-xl);
+  }
+}
+
+/* MacBook Pro 14" / 16" (1400–1799px) */
+@media (min-width: 1400px) {
+  .module-layout {
+    grid-template-columns: 360px 1fr;
+    gap: var(--space-xl);
+    padding: var(--space-xl);
+  }
+}
+
+/* iMac / externe Displays (1800–1999px) */
+@media (min-width: 1800px) {
+  .module-layout {
+    grid-template-columns: 400px 1fr;
+    gap: var(--space-xxl);
+    padding: var(--space-xxl);
+  }
+}
+
+@media (min-width: 2200px) {
+  .module-layout {
+    grid-template-columns: 440px 1fr;
+  }
+}
+
+@media (min-width: 2600px) {
+  .module-layout {
+    grid-template-columns: 480px 1fr;
+  }
+}
+
+@media (min-width: 3400px) {
+  .module-layout {
+    grid-template-columns: 560px 1fr;
+    padding: calc(var(--space-xxl) * 1.3);
+    gap: calc(var(--space-xxl) * 1.3);
+  }
+}
+
+/* Stacked layout bei schmalen Viewports */
+@media (max-width: 1099px) {
+  .module-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    overflow-y: auto;
+  }
+
+  .module-panel-left {
+    max-height: 38vh;
+    overflow-y: auto;
+  }
+
+  /* Full-canvas modules: span all grid rows to fill available height */
+  .module-layout > .module-panel-right:only-child {
+    grid-row: 1 / -1;
+    min-height: 0;
+  }
+
+  .module-panel-right {
+    min-height: 280px;
+  }
+
+  .module-panel-left .btn {
+    padding: var(--space-xs) var(--space-sm);
+    min-height: 48px; /* MUST: ≥48px Touch-Target */
+    font-size: var(--font-small);
+  }
+
+  .module-panel-left .control-block {
+    gap: var(--space-xs);
+  }
+
+  .module-panel-left .panel__body > .control-block:last-child {
+    position: sticky;
+    bottom: 0;
+    background: var(--panel);
+    z-index: 2; /* local stacking within scrollable panel — below nav-backdrop (40) */
+    padding-top: var(--space-xs);
+    border-top: 1px solid var(--line);
+    margin-top: auto;
+  }
+}
+
+/* Left panel */
+.module-panel-left {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Panel im left-panel muss Grid-Zelle füllen, damit panel__body scroll aktiviert */
+.module-panel-left > .panel {
+  height: 100%;
+}
+
+/* Right panel */
+.module-panel-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  overflow: hidden;
+  min-width: 0;
+  position: relative;
+}
+
+/* Wenn kein linkes Panel vorhanden: rechtes Panel auf volle Breite ausdehnen */
+.module-layout > .module-panel-right:only-child {
+  grid-column: 1 / -1;
+}
+
+/* ── Canvas-Only-Module: Status als Overlay über Canvas ───
+   Für Module OHNE linkes Panel (Bruchlabor, Geometrie, etc.)
+   Feedback erscheint direkt über der Aktionsfläche → Proximität!
+   pointer-events:none damit Klicks auf Canvas-Buttons durchgehen.
+   ───────────────────────────────────────────────────────── */
+.module-layout > .module-panel-right:only-child > .canvas-container {
+  flex: 1 !important;
+  min-height: 0;
+}
+
+.module-layout > .module-panel-right:only-child > .status-box {
+  position: absolute;
+  bottom: 28%;
+  left: var(--space-sm);
+  right: var(--space-sm);
+  z-index: 8; /* canvas-overlay */
+  pointer-events: none;
+  margin: 0 !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(10, 20, 50, 0.82);
+  border-radius: var(--radius-md);
+  font-size: var(--font-status);
+  font-weight: 600;
+}
+
+body.light-mode .module-layout > .module-panel-right:only-child > .status-box {
+  background: rgba(240, 244, 250, 0.90);
+}
+
+.module-layout > .module-panel-right[data-status-low]:only-child > .status-box {
+  position: static;
+  bottom: auto;
+  left: auto;
+  right: auto;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: var(--panel) !important;
+  margin: var(--space-sm) !important;
+}
+
+body.light-mode .module-layout > .module-panel-right[data-status-low]:only-child > .status-box {
+  background: var(--panel) !important;
+}
+
+.module-layout > .module-panel-right:only-child > .session-counter {
+  position: absolute;
+  bottom: calc(28% + 3.5rem + var(--space-sm));
+  right: var(--space-sm);
+  z-index: 8; /* canvas-overlay */
+  pointer-events: none;
+  margin: 0 !important;
+  background: rgba(10, 20, 50, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-micro);
+}
+
+.module-layout > .module-panel-right[data-status-low]:only-child > .session-counter {
+  position: static;
+  bottom: auto;
+  right: auto;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: var(--panel-soft) !important;
+  margin: 0 var(--space-sm) var(--space-xs) !important;
+  align-self: flex-end;
+}
+
+body.light-mode .module-layout > .module-panel-right:only-child > .session-counter {
+  background: rgba(240, 244, 250, 0.85);
+}
+
+/* ── Panel (card-like container) ───────────────────────── */
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-panel);
+}
+
+.panel--soft {
+  background: var(--panel-soft);
+}
+
+.panel--accent {
+  background: var(--accent-subtle);
+  border-color: var(--accent-border);
+}
+
+.panel__header {
+  padding: var(--space-sm) var(--space-lg);
+  border-bottom: 1px solid var(--line);
+  font-size: var(--font-small);
+  font-weight: 700;
+  color: var(--text-dim);
+  /* Kein text-transform: uppercase — MUSS für Kinder (Legasthenie-Unterstützung) */
+  letter-spacing: 0.02em;
+}
+
+.panel__body {
+  padding: var(--space-lg) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* ── Canvas Container ─────────────────────────────────── */
+.canvas-container--wheel {
+  flex: 0 0 44%;
+}
+
+.canvas-container {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  max-width: 100%; /* overflow guard: prevents canvas from escaping grid cell */
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.canvas-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+/* ── Control Block ─────────────────────────────────────── */
+
+.control-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.control-block__title {
+  font-size: var(--font-small);
+  font-weight: 700;
+  color: var(--text-dim);
+  /* Kein text-transform: uppercase — MUSS für Kinder */
+  letter-spacing: 0.02em;
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--line);
+}
+
+/* ── Progressive Disclosure: Schritt-für-Schritt Aufdeckung ───────────────
+   .step-block mit hidden-Attribut: unsichtbar + aus dem Layout entfernt.
+   Wenn hidden entfernt wird: sanfte Einblend-Animation.
+   Genutzt z.B. im Chance-Modul (Experiment → Vorhersage → Werfen).
+   ────────────────────────────────────────────────────────────────────────── */
+
+.step-block[hidden] {
+  display: none;
+}
+
+.step-block.step-block--revealing {
+  animation: stepBlockReveal var(--duration-medium) var(--ease-default) both;
+}
+
+@keyframes stepBlockReveal {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* @keyframes außerhalb von @media, da Safari <13.1 kein Hoisting von @keyframes
+   innerhalb von @media unterstützt — animation-name muss global erreichbar sein. */
+@keyframes stepBlockRevealReduced {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step-block.step-block--revealing {
+    animation: stepBlockRevealReduced var(--duration-fast) ease both;
+  }
+}
+
+/* ── Button Group (subnav) ─────────────────────────────── */
+
+.btn-group {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.btn-group--vertical {
+  flex-direction: column;
+}
+
+.btn-group--grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap-tight);
+}
+
+.btn-group--grid .btn {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-small);
+}
+
+/* ── Buttons ───────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-md) var(--space-xl);
+  /* MUST: ≥48px Touch-Target für alle Kinder-UI-Elemente */
+  min-height: 48px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    color var(--duration-fast) var(--ease-default),
+    border-color var(--duration-fast) var(--ease-default),
+    transform var(--duration-fast) var(--ease-default),
+    box-shadow var(--duration-fast) var(--ease-default),
+    filter var(--duration-fast) var(--ease-default);
+  border: 1px solid transparent;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Scale-Feedback: 0.95 on :active (SHOULD) */
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: var(--text-on-accent);
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(109, 181, 255, 0.25);
+}
+
+.btn--primary:hover {
+  filter: brightness(1.12);
+  box-shadow: 0 4px 16px rgba(109, 181, 255, 0.35);
+}
+
+.btn--secondary {
+  background: var(--accent-subtle);
+  color: var(--text);
+  border-color: var(--accent-border);
+}
+
+.btn--secondary:hover {
+  background: var(--accent-light);
+  border-color: var(--accent-border-strong);
+}
+
+.btn--secondary.active,
+.btn--secondary[aria-pressed="true"] {
+  background: var(--accent-active);
+  /* Volle Akzentfarbe als Rahmen — klar vom inaktiven Zustand (55% opacity) unterscheidbar */
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text-dim);
+  /* Sichtbarer Rahmen statt fast-unsichtbarem --line für Kinder-UI */
+  border-color: var(--accent-border);
+}
+
+.btn--ghost:hover {
+  background: var(--accent-subtle);
+  color: var(--text);
+  border-color: var(--accent-border-strong);
+}
+
+.btn--danger {
+  background: var(--bad-subtle);
+  color: var(--bad);
+  border-color: var(--bad);
+}
+
+.btn--danger:hover {
+  background: var(--bad-hover);
+}
+
+.btn--success {
+  background: var(--ok-subtle);
+  color: var(--ok);
+  border-color: var(--ok);
+}
+
+.btn--success:hover {
+  background: var(--ok-hover);
+}
+
+/* btn--sm: min-height bleibt 48px (Touch-Target MUST) */
+.btn--sm {
+  padding: var(--space-xs) var(--space-sm);
+  min-height: 48px;
+  font-size: var(--font-small);
+}
+
+/* btn--lg: empfohlene 56px für primäre Aktionen (SHOULD) */
+.btn--lg {
+  padding: var(--space-md) var(--space-lg);
+  min-height: 56px;
+  font-size: var(--font-lead);
+}
+
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.38;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  filter: none;
+}
+
+/* ── Status Box ─────────────────────────────────────────── */
+
+.status-box {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  font-size: var(--font-status);
+  font-weight: 500;
+  /* MUST: Zeilenabstand ≥1.5 für Kinder */
+  line-height: 1.55;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  transition:
+    background var(--duration-medium) var(--ease-default),
+    border-color var(--duration-medium) var(--ease-default),
+    color var(--duration-medium) var(--ease-default);
+}
+
+@keyframes status-pop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.06); }
+  65%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+.status-box--ok {
+  background: var(--ok-subtle);
+  border-color: var(--ok);
+  color: var(--ok);
+  animation: status-pop var(--duration-medium) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-box--ok {
+    animation: none;
+  }
+}
+
+.status-box--warn {
+  background: var(--warn-subtle);
+  border-color: var(--warn);
+  color: var(--warn);
+}
+
+.status-box--bad {
+  background: var(--bad-subtle);
+  border-color: var(--bad);
+  color: var(--bad);
+}
+
+.status-box--task {
+  background: var(--accent-subtle);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+/* Module-specific status-box margin (replaces inline style="margin:0.5rem 1rem") */
+.status-box--module-margin {
+  margin: var(--space-xs) var(--space-lg);
+}
+
+/* Board (≥2200px): larger status feedback for smartboard */
+@media (min-width: 2200px) {
+  .status-box {
+    padding: var(--space-md) var(--space-xl);
+    font-size: var(--font-status);
+    min-height: 48px;
+  }
+}
+
+/* Massive (≥3400px): prominent feedback for 85" smartboard */
+@media (min-width: 3400px) {
+  .status-box {
+    padding: var(--space-lg) var(--space-xxl);
+    min-height: 56px;
+    font-weight: 600;
+  }
+}
+
+/* Hide empty status-box visually but preserve layout space to prevent canvas size jump */
+.status-box:empty {
+  visibility: hidden;
+}
+
+/* ── Auto-Advance Countdown Bar ────────────────────────── */
+
+.auto-advance-bar {
+  position: relative;
+  height: 32px;
+  margin: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--panel-soft);
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+}
+
+.auto-advance-bar__fill {
+  position: absolute;
+  inset: 0;
+  width: 0%;
+  background: var(--ok);
+  opacity: 0.35;
+  border-radius: var(--radius-md);
+}
+
+.auto-advance-bar__label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: var(--font-small);
+  font-weight: 600;
+  color: var(--text);
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auto-advance-bar__fill {
+    transition: none;
+  }
+}
+
+body.light-mode .auto-advance-bar {
+  background: var(--panel);
+}
+
+/* ── Session Counter ────────────────────────────────────── */
+
+.session-counter {
+  font-size: var(--font-micro);
+  color: var(--text-dim);
+  text-align: right;
+  padding: var(--space-xs) var(--space-md);
+  min-height: 1.2rem;
+}
+
+.session-counter:empty {
+  display: none;
+}
+
+/* ── Task Box ───────────────────────────────────────────── */
+
+.task-box {
+  padding: var(--space-md) var(--space-lg);
+  background: var(--accent-subtle);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-lead);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.task-box__label {
+  font-size: var(--font-micro);
+  font-weight: 600;
+  color: var(--text-dim);
+  /* Kein text-transform: uppercase — MUSS für Kinder */
+  letter-spacing: 0.02em;
+  margin-bottom: var(--space-xs);
+}
+
+/* ── Hint Box ───────────────────────────────────────────── */
+
+.hint-box {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px dashed var(--accent-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-small);
+  color: var(--text-dim);
+  background: var(--accent-subtle);
+  /* MUST: Zeilenabstand ≥1.5 */
+  line-height: 1.55;
+}
+
+/* ── Badge / Pill ───────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-pill);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge--accent {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+
+.badge--ok {
+  background: var(--ok-subtle);
+  color: var(--ok);
+  border: 1px solid var(--ok);
+}
+
+.badge--warn {
+  background: var(--warn-subtle);
+  color: var(--warn);
+  border: 1px solid var(--warn);
+}
+
+/* ── Input ──────────────────────────────────────────────── */
+
+.input {
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: var(--font-body);
+  /* MUST: ≥48px Touch-Target */
+  min-height: 48px;
+  width: 100%;
+  transition:
+    border-color var(--duration-fast) var(--ease-default),
+    background var(--duration-fast) var(--ease-default),
+    box-shadow var(--duration-fast) var(--ease-default);
+}
+
+.input:focus {
+  border-color: var(--accent-border-strong);
+  background: rgba(255, 255, 255, 0.10);
+  box-shadow: 0 0 0 3px rgba(109, 181, 255, 0.15);
+  outline: none;
+}
+
+body.light-mode .input {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
+body.light-mode .input:focus {
+  background: var(--panel);
+  border-color: var(--accent-border-strong);
+  box-shadow: 0 0 0 3px rgba(26, 107, 196, 0.12);
+}
+
+.input--sm {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-small);
+  min-height: 48px; /* Touch-Target auch für kleine Inputs */
+}
+
+/* ── Action Bar ─────────────────────────────────────────── */
+
+.action-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  padding: var(--space-xs) 0;
+}
+
+.action-bar--center {
+  justify-content: center;
+}
+
+.action-bar--right {
+  justify-content: flex-end;
+}
+
+/* ── Mode Switcher (subnav group) ────────────────────────── */
+
+.mode-switcher {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+  padding: var(--space-xs);
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+}
+
+.mode-switcher .btn {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-small);
+  padding: var(--space-xs) var(--space-sm);
+  min-height: 48px; /* Touch-Target MUST */
+}
+
+/* ── Home / Module Cards ────────────────────────────────── */
+
+.home-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: var(--space-xl);
+  overflow-y: auto;
+  height: 100%;
+}
+
+@media (min-width: 1100px) {
+  .home-view {
+    padding: var(--space-xxl);
+    gap: var(--space-xxl);
+  }
+}
+
+.home-view__hero {
+  text-align: center;
+  padding: var(--space-xxl) 0 var(--space-xl);
+}
+
+.home-view__title {
+  font-size: var(--font-page-title);
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: var(--space-sm);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.home-view__subtitle {
+  font-size: var(--font-lead);
+  color: var(--text-dim);
+  font-weight: 400;
+  /* MUST: Zeilenabstand ≥1.5 */
+  line-height: 1.6;
+}
+
+.module-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-sm);
+  max-width: 1200px;
+  margin-inline: auto;
+  width: 100%;
+}
+
+@media (min-width: 1400px) {
+  .module-cards {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-xl);
+  }
+}
+
+@media (min-width: 1800px) {
+  .module-cards {
+    max-width: 1600px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+@media (min-width: 2600px) {
+  .module-cards {
+    max-width: 2200px;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  }
+}
+
+@media (min-width: 3400px) {
+  .module-cards {
+    max-width: 2800px;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  }
+}
+
+.module-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--panel);
+  border: 2px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: var(--text);
+  /* MUST: ≥48px Touch-Target */
+  min-height: 56px;
+  transition:
+    transform var(--duration-fast) var(--ease-default),
+    box-shadow var(--duration-fast) var(--ease-default),
+    border-color var(--duration-fast) var(--ease-default);
+}
+
+.module-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 85% 15%,
+    var(--accent-subtle),
+    transparent 55%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-medium) var(--ease-default);
+}
+
+.module-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--accent-border);
+}
+
+.module-card:hover::before {
+  opacity: 1;
+}
+
+.module-card__icon {
+  font-size: var(--icon-module);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.module-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.module-card__title {
+  font-size: var(--font-body);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.module-card__desc {
+  font-size: var(--font-micro);
+  color: var(--text-dim);
+  line-height: 1.5;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* ── Session Stats ──────────────────────────────────────── */
+
+.session-stats {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.stat-item {
+  font-size: var(--font-micro);
+  color: var(--text-dim);
+}
+
+.stat-item strong {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ── View Transitions ────────────────────────────────────── */
+
+.view {
+  display: none;
+  height: 100%;
+  overflow: hidden;
+}
+
+.view.active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Animations ─────────────────────────────────────────── */
+
+@keyframes pulse-ok {
+  0%   { box-shadow: 0 0 0 0 rgba(114, 213, 155, 0.7); }
+  60%  { box-shadow: 0 0 0 12px rgba(114, 213, 155, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(114, 213, 155, 0); }
+}
+
+@keyframes pulse-accent {
+  0%   { box-shadow: 0 0 0 0 rgba(109, 181, 255, 0.7); }
+  60%  { box-shadow: 0 0 0 12px rgba(109, 181, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(109, 181, 255, 0); }
+}
+
+@keyframes shake-bad {
+  0%, 100% { transform: translateX(0); }
+  15%, 45%, 75% { transform: translateX(-6px); }
+  30%, 60%, 90% { transform: translateX(6px); }
+}
+
+@keyframes pop-in {
+  0%   { transform: scale(0.82); opacity: 0; }
+  60%  { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slide-up-in {
+  0%   { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes slide-in-left {
+  0%   { transform: translateX(-8px); opacity: 0; }
+  100% { transform: translateX(0);    opacity: 1; }
+}
+
+.anim-pop-in {
+  animation: pop-in 0.25s var(--ease-enter) forwards;
+}
+
+.anim-pulse-ok {
+  animation: pulse-ok 0.8s ease-out;
+}
+
+.anim-shake-bad {
+  animation: shake-bad 0.5s ease-out;
+}
+
+.anim-slide-up {
+  animation: slide-up-in 0.2s var(--ease-enter) forwards;
+}
+
+/* ── Reduced Motion (MUST: prefers-reduced-motion) ───────
+   Alle Bewegungs-Animationen deaktivieren für Nutzer mit
+   vestibulären Störungen oder Epilepsie. Farb-Transitions
+   bleiben aktiv (kein Gleichgewichtsproblem). */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Keyframe-Animationen mit Bewegung: Opacity-Fade statt Bewegung */
+  .anim-pop-in    { animation: none; opacity: 1; }
+  .anim-shake-bad { animation: none; }
+  .anim-slide-up  { animation: none; opacity: 1; }
+  .anim-pulse-ok  { animation: none; }
+
+  /* Transform-Transitions unterdrücken */
+  .btn:active      { transform: none; }
+  .nav-item:hover  { transform: none; }
+  .module-card:hover { transform: none; }
+
+  /* Sidebar + Modal */
+  .app-nav         { transition: none; }
+  .nav-backdrop    { transition: none; }
+}
+
+/* ── Utilities ──────────────────────────────────────────── */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.text-dim { color: var(--text-dim); }
+.text-accent { color: var(--accent); }
+.text-ok { color: var(--ok); }
+.text-warn { color: var(--warn); }
+.text-bad { color: var(--bad); }
+
+.mt-sm { margin-top: var(--space-sm); }
+.mt-md { margin-top: var(--space-md); }
+.mt-lg { margin-top: var(--space-lg); }
+
+.flex { display: flex; }
+.flex-1 { flex: 1; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }
+
+/* ── V2: Control Bar (Baustein 7) ──────────────────────── */
+
+/* ── Action Row: Canvas-nahe Inline-Steuerung ────────────
+ * Sits at the bottom of the v2-module wrapper (after middle + numpad).
+ * On desktop: full-width below canvas+numpad side panel.
+ * On mobile: below the compact inline numpad strip.
+ */
+.control-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  min-height: 48px;
+  padding: var(--space-xs) var(--space-sm);
+  flex-shrink: 0;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.control-bar__group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.control-bar__left {
+  flex: 0 0 auto;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+.control-bar__center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.control-bar__right {
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+
+.control-bar-btn {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-small);
+  font-weight: 600;
+  min-height: 48px;
+  min-width: 48px;
+  cursor: pointer;
+  background: var(--panel-soft);
+  color: var(--text);
+  border: 1px solid var(--line);
+  white-space: nowrap;
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    border-color var(--duration-fast) var(--ease-default);
+}
+
+.control-bar-btn:hover {
+  background: var(--accent-subtle);
+  border-color: var(--accent-border);
+}
+
+.control-bar-btn:active {
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .control-bar-btn:active { transform: none; }
+}
+
+/* Board (≥2200px): wider action row for smartboard */
+@media (min-width: 2200px) {
+  .control-bar {
+    max-width: 900px;
+    gap: var(--space-md);
+  }
+  .control-bar-btn {
+    min-height: 48px;
+    min-width: 48px;
+    padding: var(--space-sm) var(--space-lg);
+    font-size: var(--font-body);
+  }
+}
+
+/* Massive (≥3400px): action row for 85" smartboard at 6-7m */
+@media (min-width: 3400px) {
+  .control-bar {
+    max-width: 1100px;
+    gap: var(--space-lg);
+  }
+  .control-bar-btn {
+    min-height: 60px;
+    min-width: 60px;
+    padding: var(--space-md) var(--space-xl);
+    font-size: var(--font-lead);
+  }
+}
+
+/* Hide control bar when on-screen keyboard is open (E19) */
+body.keyboard-open .control-bar {
+  display: none;
+}
+
+/* ── V2: Hint Button Wrapper + Progress Dots ───────────── */
+
+.hint-btn-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hint-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.hint-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+  transition: background var(--duration-fast) var(--ease-default);
+}
+
+.hint-dot--filled {
+  background: var(--accent);
+}
+
+/* ── V5: Numpad Dimming (contextual reduction) ─────────── */
+
+.numpad-btn.numpad-dimmed {
+  opacity: 0.3;
+  pointer-events: auto; /* Still clickable, just visually de-emphasized */
+}
+
+/* ── Numpad special key colors ─────────────────────────── */
+
+.numpad-btn--back {
+  background: var(--warn);
+  color: var(--text-on-accent); /* white — ensures contrast on dark warn bg in both modes */
+  font-weight: 700;
+}
+.numpad-btn--back:hover {
+  background: var(--warn-hover);
+}
+
+.numpad-btn--enter {
+  background: var(--ok);
+  color: var(--text-on-accent);
+  font-weight: 700;
+}
+.numpad-btn--enter:hover {
+  background: var(--ok-hover);
+}
+
+/* ── V2 Module Layout ──────────────────────────────────── */
+
+.v2-middle {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.v2-canvas-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* ── V2 Numpad: Rechtes Panel (Taschenrechner-Layout) ──── */
+
+.v2-numpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  flex-shrink: 0;
+  /* Responsive width: scales with viewport, min 190px for 3×48px grid + gaps */
+  width: clamp(190px, 18vw, 280px);
+  border-left: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.v2-numpad__display {
+  font-size: var(--font-lead);
+  font-weight: 700;
+  min-height: 2.5rem;
+  text-align: center;
+  width: 100%;
+  background: var(--panel-soft);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.v2-numpad__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+.v2-numpad__btn {
+  /* MUST: 48×48 CSS-px Touch-Target für Kinder */
+  min-height: 48px;
+  min-width: 48px;
+  font-size: var(--font-body);
+  font-weight: 600;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-default),
+              transform var(--duration-fast) var(--ease-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.v2-numpad__btn:hover {
+  background: var(--accent-subtle);
+}
+.v2-numpad__btn:active {
+  transform: scale(0.95);
+}
+
+.v2-numpad__btn--back {
+  background: var(--panel-soft);
+  color: var(--text-dim, var(--text));
+  font-weight: 700;
+  border-color: var(--line);
+}
+.v2-numpad__btn--back:hover {
+  background: var(--accent-subtle);
+}
+
+.v2-numpad__btn--enter {
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-weight: 700;
+  border-color: transparent;
+}
+.v2-numpad__btn--enter:hover {
+  background: var(--accent-hover, var(--accent));
+}
+
+.v2-numpad__btn.numpad-dimmed {
+  opacity: 0.3;
+  pointer-events: auto;
+}
+
+/* Smartboard (≥2200px): größere Numpad-Buttons */
+@media (min-width: 2200px) {
+  .v2-numpad {
+    gap: var(--space-md);
+    padding: var(--space-lg);
+  }
+  .v2-numpad__btn {
+    min-height: 64px;
+    font-size: var(--font-lead);
+  }
+  .v2-numpad__display {
+    font-size: var(--font-panel-title);
+    min-height: 3.5rem;
+  }
+  .v2-numpad__grid {
+    gap: var(--space-sm);
+  }
+}
+
+/* Massive Smartboard (≥3400px) */
+@media (min-width: 3400px) {
+  .v2-numpad__btn {
+    min-height: 80px;
+    font-size: var(--font-page-title);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .v2-numpad__btn:active {
+    transform: none;
+  }
+}
+
+/* Light mode */
+body.light-mode .v2-numpad {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* ── Compact Phone Numpad (< 768px): horizontal 2-row strip below canvas ─ */
+/* On phones the v2-middle stacks vertically so canvas gets full width.    */
+/* Numpad becomes a compact 6-column grid: row1=7-8-9-4-5-6, row2=1-2-3-⌫-0-OK */
+
+@media (max-width: 767px) {
+  .v2-middle {
+    flex-direction: column; /* canvas on top, numpad below */
+  }
+
+  .v2-numpad {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--line);
+    flex-direction: column;
+    padding: var(--space-xs) var(--space-sm);
+    gap: var(--space-xs);
+    /* Shrink height — it sits between canvas and control bar */
+    flex-shrink: 0;
+  }
+
+  .v2-numpad__display {
+    min-height: 2rem;
+    font-size: var(--font-body);
+    padding: var(--space-xs) var(--space-sm);
+  }
+
+  .v2-numpad__grid {
+    /* 6 columns: row1 = 7 8 9 4 5 6, row2 = 1 2 3 ⌫ 0 OK */
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--space-xs);
+  }
+
+  .v2-numpad__btn {
+    min-height: 44px;
+    font-size: var(--font-small);
+    padding: 0;
+  }
+
+  /* OK-button takes 1 cell in the 6-col grid (same as others) */
+  .v2-numpad__btn--enter {
+    font-size: var(--font-small);
+  }
+}
+
+/* ── V8: Fly Digit Animation ──────────────────────────── */
+
+.fly-digit {
+  position: fixed;
+  z-index: 120; /* toast layer — above control bar */
+  font-size: 28px;
+  font-weight: 700;
+  font-family: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  color: var(--accent);
+  pointer-events: none;
+  opacity: 0;
+  transition: none;
+  transform: translate(-50%, -50%);
+}
+
+.fly-digit--active {
+  transition:
+    left 250ms cubic-bezier(0.16, 1, 0.3, 1),
+    top 250ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 250ms ease,
+    transform 250ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fly-digit--active { transition: none; opacity: 0; }
+}
+
+/* ── V6: Onboarding Overlay ──────────────────────────── */
+
+.onboarding-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 8; /* canvas-overlay */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  animation: onboarding-fade-in 300ms var(--ease-default);
+}
+
+.onboarding-overlay--closing {
+  animation: onboarding-fade-out 300ms var(--ease-default) forwards;
+}
+
+@keyframes onboarding-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes onboarding-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-overlay,
+  .onboarding-overlay--closing {
+    animation: none;
+  }
+}
+
+.onboarding-card {
+  background: var(--panel);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl) var(--space-xxl);
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  animation: onboarding-card-pop 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes onboarding-card-pop {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-card { animation: none; }
+}
+
+.onboarding-icon {
+  font-size: 48px;
+  margin-bottom: var(--space-sm);
+}
+
+.onboarding-title {
+  font-size: var(--font-lead);
+  font-weight: 700;
+  margin: 0 0 var(--space-md) 0;
+  color: var(--text);
+}
+
+.onboarding-step {
+  font-size: var(--font-body);
+  color: var(--text-dim);
+  margin: var(--space-xs) 0;
+  line-height: 1.6;
+}
+
+.onboarding-start {
+  margin-top: var(--space-lg);
+}
+
+/* ── Tutorial Overlay ──────────────────────────────────── */
+
+.tutorial-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 8; /* canvas-overlay */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  overflow: hidden;
+  animation: onboarding-fade-in 300ms var(--ease-default);
+}
+
+.tutorial-overlay--closing {
+  animation: onboarding-fade-out 300ms var(--ease-default) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tutorial-overlay,
+  .tutorial-overlay--closing {
+    animation: none;
+  }
+}
+
+.tutorial-card {
+  background: var(--panel);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl) var(--space-xl) var(--space-lg);
+  max-width: 560px;
+  width: 92%;
+  max-height: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.35);
+  animation: onboarding-card-pop 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tutorial-card { animation: none; }
+}
+
+/* ── Tutorial Tabs ──────────────────────────────────────── */
+
+.tutorial-tabs {
+  display: flex;
+  gap: var(--space-xs);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: var(--space-xs);
+}
+
+.tutorial-tabs::-webkit-scrollbar { display: none; }
+
+.tutorial-tab {
+  flex: 0 1 auto;
+  min-width: fit-content;
+  min-height: 48px;
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--line);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: var(--font-small);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-default),
+              border-color var(--duration-fast) var(--ease-default),
+              color var(--duration-fast) var(--ease-default);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tutorial-tab { transition: opacity 150ms ease; }
+}
+
+.tutorial-tab:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.tutorial-tab--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-on-accent);
+}
+
+.tutorial-tab--active:hover {
+  color: var(--text-on-accent);
+}
+
+body.light-mode .tutorial-tab {
+  border-color: var(--line);
+  color: var(--text-dim);
+}
+
+body.light-mode .tutorial-tab--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-on-accent);
+}
+
+.tutorial-canvas {
+  width: 100%;
+  height: 220px;
+  border-radius: var(--radius-md);
+  background: var(--panel-soft);
+  flex-shrink: 0;
+}
+
+.tutorial-text {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.tutorial-title {
+  font-size: var(--font-lead);
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+
+.tutorial-desc {
+  font-size: var(--font-body);
+  line-height: 1.6;
+  margin: 0;
+  color: var(--text);
+}
+
+.tutorial-math {
+  font-size: var(--font-small);
+  line-height: 1.6;
+  margin: 0;
+  color: var(--text-dim);
+  background: var(--accent-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.tutorial-dots {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+.tutorial-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background var(--duration-fast) var(--ease-default);
+}
+
+.tutorial-dot--active {
+  background: var(--accent);
+}
+
+.tutorial-nav {
+  display: flex;
+}
+
+.tutorial-next {
+  flex: 1;
+  min-height: 48px;
+  font-size: var(--font-body);
+  font-weight: 600;
+}
+
+body.light-mode .tutorial-overlay {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+body.light-mode .tutorial-math {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+
+/* ── V2: Task Type Chips (Baustein 7) ──────────────────── */
+
+.task-chips {
+  display: flex;
+  gap: var(--space-sm);
+  height: 36px;
+  padding: 0 var(--space-lg);
+  align-items: center;
+  overflow-x: auto;
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+
+.task-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.task-chip {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-micro);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  min-height: 40px;
+  background: var(--panel-soft);
+  color: var(--text);
+  border: 1px solid transparent;
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    color var(--duration-fast) var(--ease-default);
+}
+
+.task-chip:hover {
+  background: var(--accent-subtle);
+}
+
+.task-chip.active {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+.chip-separator {
+  color: var(--text-muted, var(--text));
+  opacity: 0.3;
+  font-size: var(--font-micro);
+  user-select: none;
+  padding: 0 var(--space-xs);
+}
+
+/* Board (≥2200px): larger task chips for smartboard */
+@media (min-width: 2200px) {
+  .task-chips {
+    height: 48px;
+    gap: var(--space-md);
+  }
+  .task-chip {
+    min-height: 44px;
+    font-size: var(--font-small);
+    padding: var(--space-sm) var(--space-lg);
+  }
+}
+
+/* Massive (≥3400px): task chips for 85" smartboard */
+@media (min-width: 3400px) {
+  .task-chips {
+    height: 60px;
+    gap: var(--space-lg);
+  }
+  .task-chip {
+    min-height: 52px;
+    font-size: var(--font-body);
+    padding: var(--space-sm) var(--space-xl);
+  }
+}
+
+/* ── V2: Overlay Dialog (Baustein 7) ──────────────────── */
+
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000; /* modal */
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+}
+
+.overlay-dialog {
+  background: var(--panel);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  max-width: 680px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-panel);
+  color: var(--text);
+}
+
+.overlay-close-btn {
+  font-size: 1.5rem;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  min-width: 48px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text-dim);
+  transition: background var(--duration-fast) var(--ease-default);
+}
+
+.overlay-close-btn:hover {
+  background: var(--accent-subtle);
+  color: var(--text);
+}
+
+.overlay-diff-btn {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--font-small);
+  font-weight: 600;
+  min-width: 48px;
+  min-height: 48px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    color var(--duration-fast) var(--ease-default);
+}
+
+.overlay-diff-btn.active {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+.overlay-module-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  min-height: 64px;
+  border: 2px solid transparent;
+  background: var(--panel-soft);
+  color: var(--text);
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    border-color var(--duration-fast) var(--ease-default);
+}
+
+.overlay-module-card:hover {
+  background: var(--accent-subtle);
+  border-color: var(--accent-border);
+}
+
+.overlay-module-card.active {
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+
+/* ── Focus Indicators (E15, MUST) ──────────────────────── */
+
+:focus-visible {
+  outline: 3px solid var(--accent-focus);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* Remove default focus for mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── safe-area-inset-bottom (E14) ──────────────────────── */
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .control-bar {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* ── Micro-Animations (V2 Visual Refresh) ────────────────── */
+
+/* View crossfade: modules fade in when activated */
+@keyframes view-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.view.active {
+  animation: view-fade-in var(--duration-medium) var(--ease-enter);
+}
+
+/* Task slide-in: canvas content slides up on new task */
+@keyframes task-slide-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.task-enter {
+  animation: task-slide-in var(--duration-medium) var(--ease-enter);
+}
+
+/* Module card press feedback */
+.module-card:active {
+  transform: scale(0.97);
+}
+
+/* Control bar button pulse on hint/solution */
+@keyframes control-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(109, 181, 255, 0.5); }
+  70%  { box-shadow: 0 0 0 8px rgba(109, 181, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(109, 181, 255, 0); }
+}
+
+.control-bar-btn--pulse {
+  animation: control-pulse 600ms var(--ease-default);
+}
+
+/* Reduced-motion guard for view/task/pulse animations (audit fix) */
+@media (prefers-reduced-motion: reduce) {
+  .view.active {
+    animation: none;
+  }
+  .task-enter {
+    animation: none;
+    transform: none !important;
+  }
+  .control-bar-btn--pulse {
+    animation: none;
+  }
+  .module-card:active {
+    transform: none;
+  }
+}
+
+/* ── Print ──────────────────────────────────────────────── */
+
+@media print {
+  .app-topbar,
+  .app-nav,
+  .module-panel-left {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+
+  canvas {
+    max-width: 100%;
+  }
+}
+
+/* ── Difficulty Selector (Home Page) ──────────────────────── */
+
+.difficulty-selector {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  margin: var(--space-lg) auto var(--space-md);
+  max-width: 600px;
+}
+
+.difficulty-selector__btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--line);
+  background: var(--panel-soft);
+  color: var(--text);
+  cursor: pointer;
+  min-height: 72px;
+  transition: background var(--duration-fast) var(--ease-default),
+              border-color var(--duration-fast) var(--ease-default);
+}
+
+.difficulty-selector__btn:hover {
+  background: var(--accent-subtle);
+  border-color: var(--accent-border);
+}
+
+.difficulty-selector__btn.difficulty-selector__btn--active {
+  background: var(--accent);
+  color: var(--text-on-accent);
+  border-color: var(--accent);
+}
+
+.difficulty-selector__btn.difficulty-selector__btn--active:hover {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+.difficulty-selector__icon {
+  font-size: 24px;
+}
+
+.difficulty-selector__label {
+  font-size: var(--font-body);
+  font-weight: 700;
+}
+
+.difficulty-selector__desc {
+  font-size: var(--font-micro);
+  opacity: 0.75;
+}
+
+/* ── Difficulty Badge (Topbar) ────────────────────────────── */
+
+.difficulty-badge {
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-pill);
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  font-size: var(--font-micro);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 28px;
+  transition: background var(--duration-fast) var(--ease-default);
+}
+
+.difficulty-badge:hover {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}

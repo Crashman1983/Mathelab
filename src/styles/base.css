@@ -1,0 +1,93 @@
+/* =========================================================
+   Base Styles & Reset
+   ========================================================= */
+@import "./fonts.css";
+@import "./tokens.css";
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+  font-size: 16px;
+}
+
+body {
+  /* Atkinson Hyperlegible: entwickelt für maximale Lesbarkeit, besonders
+     bei Legasthenie. Figtree als Fallback mit hoher x-Höhe und offenen Punzen.
+     Quelle: Braille Institute / TypeSmith — Forschung zur Kinder-Lesbarkeit. */
+  font-family: 'Atkinson Hyperlegible', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(120% 100% at 0% 0%, #1a3f79 0%, var(--bg) 45%, #081226 100%);
+  min-height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  line-height: 1.5;
+  /* Leicht erhöhter Buchstabenabstand: verbessert Lesbarkeit für 8–10-Jährige */
+  letter-spacing: 0.015em;
+  -webkit-font-smoothing: antialiased;
+  /* iOS: Inhalte ragen nicht in Home-Indicator- oder Notch-Bereiche */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+body.light-mode {
+  background:
+    radial-gradient(120% 100% at 0% 0%, #dce8f7 0%, var(--bg) 45%, #c8d8f0 100%);
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Fokus-Indikatoren: 3px solid + 3px Offset + ≥3:1 Kontrast (WCAG 2.4.11 + Kinder-MUST) */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--accent-focus);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+img, svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ─── Global Reduced Motion Guard (Decision E13) ────────────────────────────
+   All transitions/animations MUST respect this. Individual components can
+   opt-in to specific reduced-motion behavior in their own styles. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 150ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── On-Screen Keyboard Support (Decision E19) ─────────────────────────── */
+body.keyboard-open .control-bar {
+  display: none;
+}

@@ -1,0 +1,32 @@
+{
+  "name": "mathelabor",
+  "version": "1.0.0",
+  "description": "Mathewerkstatt Bayern 3/4 – Interaktive Mathematik-Lernumgebung",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "typecheck": "tsc --noEmit",
+    "test:coverage": "vitest run --coverage",
+    "build:pwa": "vite build --config vite.config.pwa.ts",
+    "preview:pwa": "vite preview --config vite.config.pwa.ts --outDir dist-pwa",
+    "serve:pwa": "node scripts/serve-pwa.mjs",
+    "validate": "npm run typecheck && npm run test && npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.10",
+    "@vitest/coverage-v8": "^4.1.0",
+    "@vitest/ui": "^4.1.0",
+    "jsdom": "^28.1.0",
+    "typescript": "^5.4.5",
+    "vite": "^5.4.19",
+    "vite-plugin-pwa": "^1.2.0",
+    "vite-plugin-singlefile": "^2.0.2",
+    "vitest": "^4.1.0"
+  }
+}

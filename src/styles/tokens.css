@@ -1,0 +1,197 @@
+/* =========================================================
+   Design-Token-CSS-Custom-Properties
+   Alle Werte spiegeln src/core/design.ts wider.
+   Änderungen NUR hier oder in design.ts – nicht in Modulen.
+   ========================================================= */
+
+:root {
+  /* ── Farbrollen ─────────────────────────────────────── */
+  --bg: #0c1b33;
+  --panel: #102547;
+  --panel-soft: #14315d;
+  --line: rgba(255, 255, 255, 0.22);
+  --text: #f4f8ff;
+  --text-dim: rgba(244, 248, 255, 0.75);
+  --text-on-accent: #ffffff;
+  --accent: #6db5ff;
+  --ok: #72d59b;
+  --warn: #ffd46d;
+  --bad: #ff7a7a;
+  --grid: rgba(255, 255, 255, 0.08);
+
+  /* ── Accent-Abstufungen ─────────────────────────────── */
+  --accent-subtle: rgba(109, 181, 255, 0.08);
+  --accent-light: rgba(109, 181, 255, 0.15);
+  --accent-active: rgba(109, 181, 255, 0.18);
+  --accent-border: rgba(109, 181, 255, 0.55);
+  --accent-border-strong: rgba(109, 181, 255, 0.62);
+  --accent-focus: rgba(109, 181, 255, 0.9);
+
+  /* ── Statusfarben ───────────────────────────────────── */
+  --ok-subtle: rgba(114, 213, 155, 0.12);
+  --ok-hover: rgba(114, 213, 155, 0.20);
+  --warn-subtle: rgba(255, 212, 109, 0.12);
+  --warn-hover: rgba(255, 212, 109, 0.20);
+  --bad-subtle: rgba(255, 122, 122, 0.12);
+  --bad-hover: rgba(255, 122, 122, 0.20);
+
+  /* ── Spacing (8px-Raster) ────────────────────────────── */
+  --space-xs: 0.3rem;   /* ≈ 5px  (4px-Halbschritt) */
+  --space-sm: 0.5rem;   /* = 8px  ✓ */
+  --space-md: 0.75rem;  /* = 12px (8+4) ✓ */
+  --space-lg: 1rem;     /* = 16px ✓ */
+  --space-xl: 1.5rem;   /* = 24px ✓ */
+  --space-xxl: 2rem;    /* = 32px ✓ */
+
+  --gap: 0.75rem;
+  --gap-tight: 0.5rem;
+
+  /* ── Typografie ──────────────────────────────────────── */
+  /* Kinder 8–10 Jahre: MUST ≥18px Fließtext, ≥16px sekundär, ≥14px Mikro.
+     Clamp skaliert bis 4K-Tafel (3840px). Formeln: min ≥ MUST-Grenze.
+     Slope so gewählt, dass Lesbarkeit aus mehreren Metern erhalten bleibt. */
+
+  /* Seitentitel / App-Name */
+  --font-page-title: clamp(1.75rem, 1.2rem + 1.4vw, 5rem);
+
+  /* Panel-Überschrift / Abschnittsüberschrift */
+  --font-panel-title: clamp(1.25rem, 1.05rem + 0.52vw, 2.2rem);
+
+  /* Lead-Text / Aufgabenstellung */
+  --font-lead: clamp(1.125rem, 1.0rem + 0.32vw, 1.8rem);
+
+  /* Fließtext / Standard (MUST ≥18px = 1.125rem) */
+  --font-body: clamp(1.125rem, 1.05rem + 0.22vw, 1.8rem);
+
+  /* Sekundärtext / Labels (MUST ≥16px = 1rem) */
+  --font-small: clamp(1rem, 0.93rem + 0.22vw, 1.6rem);
+
+  /* Mikro / Hinweise / Badges (absolutes Minimum: 14px = 0.875rem) */
+  --font-micro: clamp(0.875rem, 0.82rem + 0.17vw, 1.4rem);
+
+  /* Feedback-Status-Boxen */
+  --font-status: clamp(1.125rem, 1.0rem + 0.32vw, 1.8rem);
+
+  /* Pill / Badge-Labels */
+  --font-pill: clamp(0.875rem, 0.82rem + 0.16vw, 1.4rem);
+
+  /* ── Icon-Größen ─────────────────────────────────────── */
+  --icon-module: 2.2rem;   /* Modul-Karte, Home-Grid */
+
+  /* ── Border-Radius ──────────────────────────────────── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  /* ── Schatten ───────────────────────────────────────── */
+  --shadow-panel: 0 4px 24px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-btn: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+  /* ── Animationen ────────────────────────────────────── */
+  --ease-default: ease;
+  /* Flüssige Eintritte (Forschung: cubic-bezier für Kinder natürlicher) */
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-medium: 300ms;
+  --duration-slow: 500ms;
+}
+
+/* ── Light Mode Overrides ──────────────────────────────── */
+body.light-mode {
+  --bg: #f0f4fa;
+  --panel: #ffffff;
+  --panel-soft: #e8edf5;
+  --line: rgba(0, 0, 0, 0.15);
+  --text: #1a2340;
+  --text-dim: rgba(26, 35, 64, 0.65);
+  --text-on-accent: #ffffff;
+  --accent: #1a6bc4;
+  --ok: #0d6630;        /* WCAG ≥6.0 on all light backgrounds */
+  --warn: #7a5800;      /* WCAG ≥5.5 on all light backgrounds */
+  --bad: #cc2222;
+  --grid: rgba(0, 0, 0, 0.06);
+
+  --accent-subtle: rgba(26, 107, 196, 0.06);
+  --accent-light: rgba(26, 107, 196, 0.10);
+  --accent-active: rgba(26, 107, 196, 0.12);
+  --accent-border: rgba(26, 107, 196, 0.40);
+  --accent-border-strong: rgba(26, 107, 196, 0.50);
+  --accent-focus: rgba(26, 107, 196, 0.75);
+
+  --ok-subtle: rgba(13, 102, 48, 0.10);
+  --ok-hover: rgba(13, 102, 48, 0.20);
+  --warn-subtle: rgba(122, 88, 0, 0.10);
+  --warn-hover: rgba(122, 88, 0, 0.20);
+  --bad-subtle: rgba(204, 34, 34, 0.10);
+  --bad-hover: rgba(204, 34, 34, 0.20);
+
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* ── 6-Stufen Breakpoint System (E10) ────────────────────────────────────────
+   compact:  < 768px  (Phones)
+   tablet:   768–1099px (iPad, Tablet)
+   desktop:  1100–1399px (MacBook Air)
+   wide:     1400–2199px (MacBook Pro, iMac)
+   board:    2200–3399px (Smartboard, 4K)
+   massive:  ≥ 3400px (85" Display)
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* Compact: tighter spacing for small screens */
+@media (max-width: 767px) {
+  :root {
+    --space-lg: 0.75rem;
+    --space-xl: 1rem;
+    --space-xxl: 1.5rem;
+  }
+}
+
+/* Board mode: auto-detect smartboard (≥2200px or fullscreen) */
+@media (min-width: 2200px) {
+  :root {
+    --font-body: 1.5rem;
+    --font-small: 1.25rem;
+    --font-status: 1.75rem;
+    --font-panel-title: 1.9rem;
+    --font-lead: 1.6rem;
+  }
+}
+
+/* ── 4K-Tafel: Schriftgrößen für Sichtbarkeit aus 6-7m ──────────────────────
+   85"-Display mit DPR ≈ 1.5 (CSS 2600px): Rückmeldungs-Text muss auch von
+   hinten im Klassenzimmer lesbar sein. Canvas-Fonts skalieren bereits
+   automatisch mit canvas.width – hier nur DOM-Elemente überschreiben.
+   ──────────────────────────────────────────────────────────────────────────── */
+@media (min-width: 2600px) {
+  :root {
+    --font-body: 1.75rem;       /* 28px — Buttons, Nav-Items */
+    --font-small: 1.5rem;       /* 24px — sekundäre Labels */
+    --font-status: 2.0rem;      /* 32px — Rückmeldungs-Box (Schüler lesen dies) */
+    --font-panel-title: 2.2rem; /* 35.2px — Panel-Überschriften */
+    --font-lead: 1.9rem;        /* 30.4px — Aufgabenstellungen */
+  }
+}
+
+@media (min-width: 3400px) {
+  :root {
+    --font-body: 2.1rem;        /* 33.6px */
+    --font-small: 1.75rem;      /* 28px */
+    --font-status: 2.5rem;      /* 40px — gut lesbar von 6-7m */
+    --font-panel-title: 2.8rem; /* 44.8px */
+    --font-lead: 2.3rem;        /* 36.8px */
+  }
+}
+
+/* iPad Landscape — larger fonts for reduced viewport height */
+@media (orientation: landscape) and (min-width: 768px) and (max-width: 1099px) {
+  :root {
+    --font-body: 1.25rem;       /* 20px — above 18px WCAG minimum */
+    --font-small: 1.1rem;       /* 17.6px */
+  }
+}
