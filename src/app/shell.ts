@@ -92,7 +92,6 @@ export class AppShell {
       difficulty: currentDifficulty,
       onSelectModule: (id) => {
         this.activateModule(id);
-        setRoute({ moduleId: id });
       },
       onChangeDifficulty: (level) => {
         appState.set("difficulty", level);

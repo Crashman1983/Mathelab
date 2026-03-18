@@ -51,6 +51,8 @@ export function setRoute(params: RouteParams): void {
   let hash = `#/${params.moduleId}`;
   if (params.taskType) hash += `/${params.taskType}`;
   if (params.difficulty) hash += `?d=${params.difficulty}`;
+  // Skip replaceState if URL already matches — browser enforces 100 calls/10s limit
+  if (window.location.hash === hash) return;
   history.replaceState(null, "", hash);
 }
 
@@ -70,5 +72,7 @@ export function onRouteChange(
  * Navigate to home (clear hash).
  */
 export function navigateHome(): void {
+  // Skip replaceState if there is no hash to clear
+  if (!window.location.hash) return;
   history.replaceState(null, "", window.location.pathname);
 }
