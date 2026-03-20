@@ -92,11 +92,11 @@ describe("TTS", () => {
     expect(utterance.lang).toBe("de-DE");
   });
 
-  it("speak setzt rate auf 0.85", () => {
+  it("speak setzt rate auf 0.82 (Standard-Stimme, verlangsamt für Kinder)", () => {
     setTTSEnabled(true);
     speak("Test");
     const utterance = mockSynth.speak.mock.calls[0][0] as MockUtterance;
-    expect(utterance.rate).toBe(0.85);
+    expect(utterance.rate).toBe(0.82);
   });
 
   it("speak mit priority=true ruft cancel vorher auf", () => {
