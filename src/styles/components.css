@@ -17,14 +17,17 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  padding: 0 var(--space-lg);
+  /* padding-top: safe-area-inset-top sorgt dafür, dass Buttons nicht hinter
+     der iOS-Statusleiste verschwinden (notwendig mit viewport-fit=cover).
+     Auf Android/Desktop ist env(safe-area-inset-top) = 0 → kein Effekt. */
+  padding: env(safe-area-inset-top) var(--space-lg) 0;
   background: rgba(0, 0, 0, 0.32);
   border-bottom: 1px solid var(--line);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   flex-shrink: 0;
   z-index: 100; /* topbar */
-  min-height: clamp(56px, 3.6vw, 80px);
+  min-height: calc(clamp(56px, 3.6vw, 80px) + env(safe-area-inset-top));
   position: relative;
 }
 
@@ -52,6 +55,8 @@
   color: var(--text);
   white-space: nowrap;
   letter-spacing: -0.01em;
+  padding: 0;
+  min-height: 48px;
 }
 
 .app-topbar__spacer {
@@ -92,6 +97,9 @@
   display: flex;
   align-items: center;
   gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-sm);
+  min-height: 44px;
 }
 
 .app-topbar__module::before {
@@ -869,21 +877,48 @@ body.light-mode .module-layout > .module-panel-right:only-child > .session-count
   margin: var(--space-xs) var(--space-lg);
 }
 
-/* Board (≥2200px): larger status feedback for smartboard */
+/* V2 module feedback: centered full-width between canvas+numpad and control bar.
+   Action-reaction proximity: feedback appears near both the canvas task and numpad input. */
+.status-box--module-feedback {
+  margin: var(--space-xs) auto;
+  max-width: 720px;
+  width: calc(100% - 2 * var(--space-lg));
+  text-align: center;
+  flex-shrink: 0;
+}
+
 @media (min-width: 2200px) {
-  .status-box {
-    padding: var(--space-md) var(--space-xl);
-    font-size: var(--font-status);
-    min-height: 48px;
+  .status-box--module-feedback {
+    max-width: 900px;
   }
 }
 
-/* Massive (≥3400px): prominent feedback for 85" smartboard */
+@media (min-width: 3400px) {
+  .status-box--module-feedback {
+    max-width: 1100px;
+  }
+}
+
+/* Board (≥2200px): larger status feedback for smartboard (readable at 4-5m) */
+@media (min-width: 2200px) {
+  .status-box {
+    padding: var(--space-md) var(--space-xl);
+    font-size: var(--font-lead);
+    min-height: 52px;
+    border-width: 2px;
+    border-radius: var(--radius-md);
+  }
+}
+
+/* Massive (≥3400px): prominent feedback for 85" smartboard (readable at 6-7m) */
 @media (min-width: 3400px) {
   .status-box {
     padding: var(--space-lg) var(--space-xxl);
-    min-height: 56px;
+    font-size: var(--font-panel-title);
+    min-height: 64px;
     font-weight: 600;
+    border-width: 3px;
+    border-radius: var(--radius-lg);
   }
 }
 
@@ -1099,22 +1134,54 @@ body.light-mode .input:focus {
 .home-view {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
-  padding: var(--space-xl);
+  gap: var(--space-lg);
+  padding: var(--space-lg);
   overflow-y: auto;
   height: 100%;
 }
 
 @media (min-width: 1100px) {
   .home-view {
-    padding: var(--space-xxl);
-    gap: var(--space-xxl);
+    padding: var(--space-xl);
+    gap: var(--space-xl);
+  }
+}
+
+/* Board: tighter gaps so module cards stay visible */
+@media (min-width: 2200px) {
+  .home-view {
+    padding: var(--space-lg) var(--space-xl);
+    gap: var(--space-lg);
   }
 }
 
 .home-view__hero {
   text-align: center;
-  padding: var(--space-xxl) 0 var(--space-xl);
+  padding: var(--space-lg) 0 var(--space-md);
+  flex-shrink: 0;
+}
+
+/* Board (≥2200px): compact hero so cards are visible on smartboard */
+@media (min-width: 2200px) {
+  .home-view__hero {
+    padding: var(--space-md) 0 var(--space-sm);
+  }
+  .home-view__title {
+    font-size: clamp(2.5rem, 2.8vw, 4rem);
+  }
+  .home-view__subtitle {
+    font-size: clamp(1.3rem, 1.5vw, 2rem);
+  }
+}
+
+/* Massive (≥3400px): further scaling for 85" display */
+@media (min-width: 3400px) {
+  .home-view__hero {
+    padding: var(--space-lg) 0 var(--space-md);
+  }
+  .home-view__title {
+    font-size: clamp(3rem, 3vw, 5rem);
+  }
 }
 
 .home-view__title {
@@ -1192,6 +1259,41 @@ body.light-mode .input:focus {
     transform var(--duration-fast) var(--ease-default),
     box-shadow var(--duration-fast) var(--ease-default),
     border-color var(--duration-fast) var(--ease-default);
+}
+
+/* Board (≥2200px): larger cards for smartboard visibility */
+@media (min-width: 2200px) {
+  .module-card {
+    min-height: 80px;
+    padding: var(--space-lg) var(--space-xl);
+    gap: var(--space-lg);
+    border-radius: var(--radius-xl);
+    border-width: 3px;
+  }
+  .module-card__icon {
+    font-size: clamp(2rem, 2.5vw, 3.5rem);
+  }
+  .module-card__title {
+    font-size: var(--font-lead);
+  }
+  .module-card__desc {
+    font-size: var(--font-body);
+  }
+}
+
+/* Massive (≥3400px): very large cards for 85" display at 6-7m */
+@media (min-width: 3400px) {
+  .module-card {
+    min-height: 100px;
+    padding: var(--space-xl) var(--space-xxl);
+    gap: var(--space-xl);
+  }
+  .module-card__icon {
+    font-size: clamp(2.5rem, 3vw, 4rem);
+  }
+  .module-card__title {
+    font-size: var(--font-panel-title);
+  }
 }
 
 .module-card::before {
@@ -1459,31 +1561,138 @@ body.light-mode .input:focus {
   .control-bar-btn:active { transform: none; }
 }
 
-/* Board (≥2200px): wider action row for smartboard */
+/* ── Control Bar "More" Popover ────────────────────────── */
+
+.control-bar-more {
+  position: relative;
+}
+
+.control-bar-btn--more {
+  opacity: 0.7;
+}
+
+.control-bar-popover {
+  position: absolute;
+  bottom: calc(100% + var(--space-xs));
+  left: 0;
+  z-index: 56; /* control-bar layer */
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  min-width: 220px;
+  padding: var(--space-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: pop-in 0.2s var(--ease-enter);
+}
+
+body.light-mode .control-bar-popover {
+  background: var(--panel);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .control-bar-popover { animation: none; }
+}
+
+.control-bar-popover__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--font-small);
+  font-weight: 500;
+  cursor: pointer;
+  min-height: 44px;
+  white-space: nowrap;
+  text-align: left;
+  width: 100%;
+  transition: background var(--duration-fast) var(--ease-default);
+}
+
+.control-bar-popover__item:hover {
+  background: var(--accent-subtle);
+}
+
+/* Board (≥2200px): larger popover for smartboard */
+@media (min-width: 2200px) {
+  .control-bar-popover {
+    min-width: 280px;
+  }
+  .control-bar-popover__item {
+    min-height: 52px;
+    font-size: var(--font-body);
+    padding: var(--space-md) var(--space-lg);
+  }
+}
+
+/* Board (≥2200px): wider action row for smartboard (visible at 4-5m) */
 @media (min-width: 2200px) {
   .control-bar {
-    max-width: 900px;
+    max-width: 1000px;
     gap: var(--space-md);
+    min-height: 64px;
+    padding: var(--space-sm) var(--space-md);
   }
   .control-bar-btn {
-    min-height: 48px;
-    min-width: 48px;
-    padding: var(--space-sm) var(--space-lg);
+    min-height: 56px;
+    min-width: 56px;
+    padding: var(--space-sm) var(--space-xl);
     font-size: var(--font-body);
+    border-width: 2px;
   }
 }
 
 /* Massive (≥3400px): action row for 85" smartboard at 6-7m */
 @media (min-width: 3400px) {
   .control-bar {
-    max-width: 1100px;
+    max-width: 1400px;
     gap: var(--space-lg);
+    min-height: 80px;
+    padding: var(--space-md) var(--space-lg);
   }
   .control-bar-btn {
-    min-height: 60px;
-    min-width: 60px;
-    padding: var(--space-md) var(--space-xl);
+    min-height: 72px;
+    min-width: 72px;
+    padding: var(--space-md) var(--space-xxl);
     font-size: var(--font-lead);
+    border-width: 2px;
+    border-radius: var(--radius-lg);
+  }
+}
+
+/* Compact control bar on mobile (< 768px) — hide text labels, keep icons */
+@media (max-width: 767px) {
+  .control-bar {
+    gap: var(--space-xs);
+    padding: var(--space-xs);
+  }
+
+  .control-bar__left {
+    gap: var(--space-xs);
+  }
+
+  /* Hide text labels, keep emoji icons */
+  .control-bar-label {
+    display: none;
+  }
+
+  .control-bar-btn {
+    padding: var(--space-xs) var(--space-sm);
+    min-width: 44px;
+    font-size: var(--font-body);
+  }
+
+  /* Hide hint progress dots on compact */
+  .hint-dots {
+    display: none;
   }
 }
 
@@ -1875,6 +2084,24 @@ body.light-mode .v2-numpad {
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.35);
   animation: onboarding-card-pop 400ms cubic-bezier(0.16, 1, 0.3, 1);
   overflow-y: auto;
+}
+
+@media (min-width: 1100px) {
+  .tutorial-card {
+    max-width: 680px;
+  }
+  .tutorial-canvas {
+    height: 280px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .tutorial-card {
+    max-width: 800px;
+  }
+  .tutorial-canvas {
+    height: 320px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2289,7 +2516,7 @@ body.light-mode .tutorial-math {
   display: flex;
   gap: var(--space-sm);
   justify-content: center;
-  margin: var(--space-lg) auto var(--space-md);
+  margin: var(--space-md) auto var(--space-sm);
   max-width: 600px;
 }
 
@@ -2340,6 +2567,44 @@ body.light-mode .tutorial-math {
   opacity: 0.75;
 }
 
+/* Board (≥2200px): scale up difficulty selector for smartboard readability */
+@media (min-width: 2200px) {
+  .difficulty-selector {
+    max-width: 900px;
+    gap: var(--space-md);
+  }
+  .difficulty-selector__btn {
+    min-height: 88px;
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-lg);
+    border-width: 3px;
+  }
+  .difficulty-selector__icon {
+    font-size: 36px;
+  }
+  .difficulty-selector__label {
+    font-size: var(--font-lead);
+  }
+  .difficulty-selector__desc {
+    font-size: var(--font-small);
+  }
+}
+
+/* Massive (≥3400px): even larger for 85" at 6-7m */
+@media (min-width: 3400px) {
+  .difficulty-selector {
+    max-width: 1200px;
+    gap: var(--space-lg);
+  }
+  .difficulty-selector__btn {
+    min-height: 100px;
+    padding: var(--space-lg) var(--space-xl);
+  }
+  .difficulty-selector__icon {
+    font-size: 48px;
+  }
+}
+
 /* ── Difficulty Badge (Topbar) ────────────────────────────── */
 
 .difficulty-badge {
@@ -2359,4 +2624,22 @@ body.light-mode .tutorial-math {
 .difficulty-badge:hover {
   background: var(--accent);
   color: var(--text-on-accent);
+}
+
+/* Board (≥2200px): larger difficulty badge for smartboard */
+@media (min-width: 2200px) {
+  .difficulty-badge {
+    font-size: var(--font-small);
+    min-height: 36px;
+    padding: var(--space-xs) var(--space-md);
+  }
+}
+
+/* Massive (≥3400px): difficulty badge for 85" display */
+@media (min-width: 3400px) {
+  .difficulty-badge {
+    font-size: var(--font-body);
+    min-height: 44px;
+    padding: var(--space-sm) var(--space-lg);
+  }
 }

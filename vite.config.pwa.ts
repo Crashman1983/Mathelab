@@ -22,7 +22,7 @@ export default defineConfig({
         description: "Interaktive Mathematik für die Grundschule",
         start_url: base,
         scope: base,
-        display: "standalone",
+        display: "fullscreen",
         orientation: "any",
         theme_color: "#0F1B2D",
         background_color: "#0F1B2D",
