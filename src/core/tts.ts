@@ -28,14 +28,26 @@ const STORAGE_KEY = "mathelabor_tts_enabled";
  * Niedrigerer Index = höhere Priorität.
  */
 const PREFERRED_VOICE_NAMES: ReadonlyArray<string> = [
-  // Apple Neural / Enhanced (macOS 14+, iOS 17+)
+  // Apple Neural / Enhanced (macOS 14+, iOS 17+) — beste Qualität
   "Anna (Enhanced)",
   "Nils (Enhanced)",
   "Markus (Enhanced)",
-  // Apple Standard (macOS/iOS)
+  "Petra (Enhanced)",
+  // Apple Persönlichkeits-Stimmen (macOS 12+, iOS 15+) — deutlich natürlicher als Classic
+  // Format: "Name (Deutsch (Deutschland))" — für Kinder: weibliche Stimmen bevorzugt
+  "Flo (Deutsch",       // friendly, jung-weiblich — ideal für Kinder
+  "Sandy (Deutsch",     // freundlich-weiblich
+  "Shelley (Deutsch",   // weiblich
+  "Eddy (Deutsch",      // männlich, freundlich
+  "Reed (Deutsch",      // männlich, neutral
+  "Rocko (Deutsch",     // männlich, energisch
+  "Grandma (Deutsch",   // großmütterlich — beruhigend
+  "Grandpa (Deutsch",   // großväterlich
+  // Apple Classic (macOS/iOS — robotischer als Persönlichkeits-Stimmen)
   "Anna",
   "Nils",
   "Markus",
+  "Petra",
   // Microsoft Neural (Windows 11, Edge)
   "Microsoft Katja Online (Natural)",
   "Microsoft Conrad Online (Natural)",
@@ -97,22 +109,28 @@ interface VoiceParams {
 }
 
 function getVoiceParams(voice: SpeechSynthesisVoice | null): VoiceParams {
-  if (!voice) return { rate: 0.85, pitch: 1.1 };
+  if (!voice) return { rate: 0.82, pitch: 1.05 };
 
   const name = voice.name.toLowerCase();
 
-  // Neurale Stimmen klingen bei normalem Rate natürlicher
+  // Apple Enhanced / Microsoft Natural / Neural — sehr natürlich, minimale Verlangsamung
   if (name.includes("enhanced") || name.includes("natural") || name.includes("neural")) {
-    return { rate: 0.92, pitch: 1.0 };
+    return { rate: 0.90, pitch: 1.0 };
   }
 
-  // Google Deutsch — etwas schneller als Apple Standard
+  // Apple Persönlichkeits-Stimmen (Flo, Sandy, Eddy, …) — modernes Synthesis-System
+  // "(deutsch" matcht "(Deutsch (Deutschland))" case-insensitive
+  if (name.includes("(deutsch") || name.includes("(german")) {
+    return { rate: 0.88, pitch: 1.0 };
+  }
+
+  // Google Deutsch
   if (name.includes("google")) {
-    return { rate: 0.88, pitch: 1.05 };
+    return { rate: 0.86, pitch: 1.0 };
   }
 
-  // Apple Standard, Microsoft Standard — leicht verlangsamt für Kinder
-  return { rate: 0.85, pitch: 1.1 };
+  // Apple Classic / Microsoft Standard — deutlich verlangsamt, leicht erhöhtes Pitch für Kinder
+  return { rate: 0.82, pitch: 1.08 };
 }
 
 // ─── Enabled State ─────────────────────────────────────────────────────────
@@ -161,6 +179,37 @@ export function getAvailableGermanVoices(): SpeechSynthesisVoice[] {
   return _voices;
 }
 
+// ─── Text-Normalisierung ────────────────────────────────────────────────────
+
+/**
+ * Bereitet Text für TTS auf — ersetzt Mathe-Symbole durch ausgeschriebene Wörter,
+ * damit die Stimme "3 mal 4" statt "3 x 4" sagt.
+ */
+function normalizeForSpeech(text: string): string {
+  return text
+    // Mathe-Operatoren
+    .replace(/×/g, " mal ")
+    .replace(/÷/g, " geteilt durch ")
+    .replace(/\+/g, " plus ")
+    .replace(/−/g, " minus ")       // Unicode-Minus (U+2212)
+    .replace(/–/g, " minus ")       // En-Dash als Minus
+    .replace(/=/g, " ist ")
+    .replace(/≠/g, " ist nicht ")
+    .replace(/</g, " kleiner als ")
+    .replace(/>/g, " größer als ")
+    .replace(/≤/g, " kleiner oder gleich ")
+    .replace(/≥/g, " größer oder gleich ")
+    // Brüche
+    .replace(/½/g, " ein halb ")
+    .replace(/¼/g, " ein viertel ")
+    .replace(/¾/g, " drei viertel ")
+    // Fragezeichen am Ende entfernen (TTS macht sonst Frageintonation)
+    .replace(/\?$/, "")
+    // Mehrfache Leerzeichen normalisieren
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 // ─── Speak ─────────────────────────────────────────────────────────────────
 
 /**
@@ -181,10 +230,13 @@ export function speak(text: string, force = false, priority = true): void {
     synth.cancel(); // Vorherige Ausgabe sofort stoppen
   }
 
-  const utterance = new SpeechSynthesisUtterance(text);
+  const utterance = new SpeechSynthesisUtterance(normalizeForSpeech(text));
 
   // Deutsche Sprache
   utterance.lang = "de-DE";
+
+  // Stimmen ggf. nachladen (kann beim ersten Aufruf noch leer sein)
+  if (!_bestVoice) loadVoices();
 
   // Beste verfügbare Stimme setzen (null = Browser-Default)
   if (_bestVoice) {
