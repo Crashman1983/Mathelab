@@ -13,6 +13,10 @@
 html {
   height: 100%;
   font-size: 16px;
+  /* Verhindert Double-Tap-Zoom auf iPad/iPhone — Smartboard-Präsentationstool
+     braucht kein Browser-Zoom. Pinch-to-Zoom bleibt weiterhin möglich.
+     Referenz: WHATWG touch-action spec, MDN – touch-action: manipulation */
+  touch-action: manipulation;
 }
 
 body {

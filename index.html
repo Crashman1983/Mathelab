@@ -2,15 +2,19 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- viewport-fit=cover: Inhalte bis zum Rand (Notch / Home-Indicator werden
+       per env(safe-area-inset-*) in base.css ausgespart) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Mathewerkstatt Bayern 3/4</title>
   <meta name="description" content="Mathewerkstatt Bayern 3/4 – Interaktive Mathematik-Lernumgebung für die Grundschule" />
   <meta name="theme-color" content="#0F1B2D" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Mathewerkstatt" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="/manifest.json" />
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <!-- Relative Pfade: funktionieren bei /Mathelab/ (GitHub Pages) und / (Dev) -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <!-- Offline-Nutzung: Diese Datei lokal speichern (Strg+S / Cmd+S). Alle Ressourcen sind inline – kein Netzwerk nötig. -->
   <!-- Schriftarten: Atkinson Hyperlegible (Legasthenie-optimiert) ist inline eingebettet (fonts.css).
        Kein CDN nötig — funktioniert vollständig offline. -->
@@ -20,8 +24,8 @@
 
     <!-- Top Bar -->
     <header class="app-topbar" role="banner">
-      <button id="topbar-home" class="app-topbar__title" type="button" aria-label="Startseite" title="Startseite (Alt+0)" style="cursor:pointer;background:none;border:none;color:inherit;font:inherit;padding:0;min-height:48px">🔢 Mathewerkstatt</button>
-      <button id="topbar-module-label" class="app-topbar__module" type="button" aria-label="Modul-Auswahl öffnen" aria-live="polite" hidden style="cursor:pointer;background:none;border:none;color:inherit;font:inherit;padding:4px 12px;border-radius:var(--radius-sm);min-height:44px"></button>
+      <button id="topbar-home" class="app-topbar__title" type="button" aria-label="Startseite" title="Startseite (Alt+0)">🔢 Mathewerkstatt</button>
+      <button id="topbar-module-label" class="app-topbar__module" type="button" aria-label="Modul-Auswahl öffnen" aria-live="polite" hidden></button>
       <div id="topbar-chips" class="topbar-chips" hidden></div>
       <div class="app-topbar__spacer"></div>
       <div id="session-stats" class="session-stats" aria-live="polite"></div>

@@ -66,8 +66,10 @@ jobs:
       - name: Ausgaben zusammenführen → _site/
         run: |
           mkdir -p _site/pwa
-          # Single-File HTML → Root
-          cp dist/index.html _site/index.html
+          # Single-File + public assets (manifest.json, icons/, favicon.svg) → Root
+          # cp -r dist/. statt nur dist/index.html — sonst fehlt das Manifest
+          # und iOS kann die App nicht zum Home-Screen hinzufügen.
+          cp -r dist/. _site/
           # PWA → Unterverzeichnis /pwa/
           cp -r dist-pwa/. _site/pwa/
 
