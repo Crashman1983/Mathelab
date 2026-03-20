@@ -192,16 +192,16 @@ function buildPlaceScene(ctx: Ctx): CanvasNode {
   const answered = result?.correct === true;
   const wrong = result !== null && !result.correct;
 
-  // Nur T/H/Z/E für Klasse 3-4 (bis 9.999); bei größeren Zahlen zusätzlich ZT/HT
+  // Nur die Stellen anzeigen, die die Zahl tatsächlich hat (Anzahl Ziffern).
+  // 56 → Z + E (2 Spalten), 456 → H + Z + E, 1456 → T + H + Z + E usw.
+  const numDigits = String(task.target).length;
   const places: [string, string, number][] = [];
-  if (pv.hundredThousands > 0) places.push(["HT", "Hunderttausender", pv.hundredThousands]);
-  if (pv.tenThousands > 0)     places.push(["ZT", "Zehntausender", pv.tenThousands]);
-  places.push(
-    ["T", "Tausender", pv.thousands],
-    ["H", "Hunderter", pv.hundreds],
-    ["Z", "Zehner",    pv.tens],
-    ["E", "Einer",     pv.ones],
-  );
+  if (numDigits >= 6) places.push(["HT", "Hunderttausender", pv.hundredThousands]);
+  if (numDigits >= 5) places.push(["ZT", "Zehntausender",    pv.tenThousands]);
+  if (numDigits >= 4) places.push(["T",  "Tausender",        pv.thousands]);
+  if (numDigits >= 3) places.push(["H",  "Hunderter",        pv.hundreds]);
+  if (numDigits >= 2) places.push(["Z",  "Zehner",           pv.tens]);
+  places.push(["E", "Einer", pv.ones]);
 
   // Map typed input digits to place-value positions (left-to-right).
   // The student types the full number, and we show each digit in its
@@ -287,7 +287,8 @@ function buildPlaceScene(ctx: Ctx): CanvasNode {
 
           // ── Full place-value name label ──
           const nameLabel = placeLabels[abbr] ?? abbr;
-          const nameFontSize = Math.max(9, boxW * 0.18);
+          // Mindest 14px — bei 4 Spalten skaliert boxW auf ~72px → 14px, bei 2 Spalten → größer
+          const nameFontSize = Math.max(14, boxW * 0.22);
           c.font = `600 ${nameFontSize}px 'Atkinson Hyperlegible', system-ui, sans-serif`;
           c.fillStyle = isActive ? palette.accent : palette.canvasTextDim;
           c.textAlign = "center";
@@ -368,7 +369,7 @@ function buildPlaceScene(ctx: Ctx): CanvasNode {
 
           // ── Abbreviation below box ──
           const abbrY = digitY + boxH / 2 + Math.max(8, boxW * 0.15);
-          c.font = `700 ${Math.max(11, boxW * 0.22)}px 'Atkinson Hyperlegible', system-ui, sans-serif`;
+          c.font = `700 ${Math.max(13, boxW * 0.25)}px 'Atkinson Hyperlegible', system-ui, sans-serif`;
           c.fillStyle = isActive ? palette.accent : palette.canvasTextDim;
           c.textAlign = "center";
           c.textBaseline = "middle";
@@ -471,6 +472,26 @@ function buildCompareScene(ctx: Ctx): CanvasNode {
 let jumpAnimStart = 0;
 let jumpAnimActive = false;
 let jumpAnimScene: { invalidate(): void } | null = null;
+let jumpAnimRafId = 0;
+
+/** Drive the jump animation via a separate RAF loop so invalidate() is called
+ *  OUTSIDE the draw() call, preventing needsRender from being reset immediately. */
+function startJumpAnimation(steps: number): void {
+  cancelAnimationFrame(jumpAnimRafId);
+  jumpAnimStart = performance.now();
+  jumpAnimActive = true;
+  const totalDuration = steps * 0.18 + 1.0; // seconds — enough for all arcs + buffer
+  const tick = (): void => {
+    const elapsed = (performance.now() - jumpAnimStart) / 1000;
+    if (jumpAnimActive && elapsed < totalDuration) {
+      jumpAnimScene?.invalidate();
+      jumpAnimRafId = requestAnimationFrame(tick);
+    } else {
+      jumpAnimActive = false;
+    }
+  };
+  jumpAnimRafId = requestAnimationFrame(tick);
+}
 
 function buildJumpScene(ctx: Ctx): CanvasNode {
   const { task, input, result } = ctx;
@@ -481,13 +502,14 @@ function buildJumpScene(ctx: Ctx): CanvasNode {
   const dir = task.direction ?? 1;
   const dirLabel = dir > 0 ? "vorwärts" : "rückwärts";
 
-  // Start animation on correct answer
+  // Start animation on correct answer (via RAF loop, not from within draw)
   if (answered && !jumpAnimActive) {
-    jumpAnimStart = performance.now();
-    jumpAnimActive = true;
+    startJumpAnimation(steps);
   }
   if (!answered) {
     jumpAnimActive = false;
+    cancelAnimationFrame(jumpAnimRafId);
+    jumpAnimRafId = 0;
   }
 
   return vstack([
@@ -518,14 +540,18 @@ function buildJumpScene(ctx: Ctx): CanvasNode {
         c.lineTo(lx1, lineY);
         c.stroke();
 
+        // Responsive sizes
+        const tickFontSize = Math.max(13, r.w * 0.025);
+        const markerRadius = Math.max(10, r.w * 0.018);
+
         // Tick marks + labels
         c.textAlign = "center";
         c.textBaseline = "top";
-        c.font = `600 13px 'Atkinson Hyperlegible', system-ui, sans-serif`;
+        c.font = `600 ${tickFontSize}px 'Atkinson Hyperlegible', system-ui, sans-serif`;
         for (let v = range.min; v <= range.max; v += range.step) {
           const tx = pos(v);
           const isEndpoint = v === start || v === task.target;
-          const tickH = isEndpoint ? 10 : 6;
+          const tickH = isEndpoint ? markerRadius * 0.8 : markerRadius * 0.5;
           c.beginPath();
           c.moveTo(tx, lineY - tickH);
           c.lineTo(tx, lineY + tickH);
@@ -539,13 +565,13 @@ function buildJumpScene(ctx: Ctx): CanvasNode {
 
         // ─── Start marker (filled circle) ─────────────────
         c.beginPath();
-        c.arc(pos(start), lineY, 10, 0, Math.PI * 2);
+        c.arc(pos(start), lineY, markerRadius, 0, Math.PI * 2);
         c.fillStyle = palette.canvasPrimary;
         c.fill();
 
         // ─── Target marker (ring) ─────────────────────────
         c.beginPath();
-        c.arc(pos(task.target), lineY, 10, 0, Math.PI * 2);
+        c.arc(pos(task.target), lineY, markerRadius, 0, Math.PI * 2);
         c.strokeStyle = palette.canvasSuccess;
         c.lineWidth = 3;
         c.stroke();
@@ -605,7 +631,7 @@ function buildJumpScene(ctx: Ctx): CanvasNode {
           if (t > 0.5) {
             c.globalAlpha = Math.min(1, (t - 0.5) * 4);
             c.fillStyle = palette.canvasPrimary;
-            c.font = `700 14px 'Atkinson Hyperlegible', system-ui, sans-serif`;
+            c.font = `700 ${tickFontSize}px 'Atkinson Hyperlegible', system-ui, sans-serif`;
             c.textAlign = "center";
             c.textBaseline = "bottom";
             c.fillText(`${i + 1}`, cx, lineY - arcH - 4);
@@ -614,10 +640,7 @@ function buildJumpScene(ctx: Ctx): CanvasNode {
           c.restore();
         }
 
-        // Request redraw during animation
-        if (jumpAnimActive && elapsed < steps * 0.18 + 0.5) {
-          jumpAnimScene?.invalidate();
-        }
+        // Redraws are driven by the RAF loop in startJumpAnimation() — no invalidate() here
       },
     }),
     text(
@@ -904,6 +927,8 @@ export const numbersV2Registration = defineModule<NumbersTask, NumbersState2>({
     compareCallback = null;
     jumpAnimScene = null;
     jumpAnimActive = false;
+    cancelAnimationFrame(jumpAnimRafId);
+    jumpAnimRafId = 0;
   },
 
   buildScene(ctx) {

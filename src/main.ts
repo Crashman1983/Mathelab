@@ -189,6 +189,9 @@ function bootstrap(): void {
   shell.restoreSession();
 }
 
+// SW-Update-Banner initialisieren (PWA only — no-op im normalen Browser-Build)
+import("./app/sw-update").then(({ initSWUpdate }) => initSWUpdate()).catch(() => {});
+
 // Starte nach DOM-Bereitschaft
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", bootstrap);
