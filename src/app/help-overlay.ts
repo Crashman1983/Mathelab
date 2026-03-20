@@ -253,9 +253,9 @@ function buildContent(): string {
         <h2 class="help-section__title">🔒 Datenschutz &amp; Rechtliches</h2>
         <ul class="help-list">
           <li>
-            <strong>Keine Datenübertragung:</strong> Die App sendet keinerlei Daten
-            an externe Server. Es werden keine Cookies gesetzt, kein Tracking
-            durchgeführt, keine Analytics erhoben.
+            <strong>Keine Datenübertragung durch die App:</strong> Die App selbst
+            sendet keinerlei Daten an externe Server. Es werden keine Cookies gesetzt,
+            kein Tracking durchgeführt, keine Analytics erhoben.
           </li>
           <li>
             <strong>Lokale Speicherung:</strong> Lernfortschritt, Schwierigkeitsgrad
@@ -263,8 +263,23 @@ function buildContent(): string {
             Ihres Geräts gespeichert. Diese Daten verlassen das Gerät nicht.
           </li>
           <li>
-            <strong>Kein Profiling:</strong> Es werden keine Nutzerprofile erstellt.
-            Die App hat keinerlei Kenntnis davon, wer sie benutzt.
+            <strong>Hosting durch GitHub Pages (Microsoft):</strong> Diese App wird
+            über GitHub Pages bereitgestellt. Beim Zugriff über
+            <a href="https://crashman1983.github.io/Mathelab/" target="_blank"
+               rel="noopener noreferrer" class="help-link">github.io</a>
+            erfasst GitHub (Microsoft) serverseitig technische Zugriffsdaten,
+            insbesondere <strong>IP-Adressen und Zeitstempel</strong>, zur
+            Sicherstellung des Betriebs und zur Erfüllung gesetzlicher Pflichten.
+            Die App hat darauf keinen Zugriff und keine Kontrolle darüber.
+            Weitere Informationen:
+            <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
+               target="_blank" rel="noopener noreferrer" class="help-link">
+              GitHub Datenschutzerklärung
+            </a>.
+          </li>
+          <li>
+            <strong>Kein Profiling:</strong> Es werden weder durch die App noch durch
+            den Betreiber Nutzerprofile erstellt.
           </li>
           <li>
             <strong>Kein kommerzieller Zweck:</strong> Diese App ist ein privates,
