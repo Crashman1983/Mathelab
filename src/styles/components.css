@@ -2643,3 +2643,271 @@ body.light-mode .tutorial-math {
     padding: var(--space-sm) var(--space-lg);
   }
 }
+
+/* ── Hilfe-Overlay (modal, z-index: 1000) ────────────────── */
+
+.help-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000; /* modal */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: var(--space-md);
+  animation: help-fade-in 200ms ease;
+}
+
+.help-modal {
+  background: var(--panel);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+  width: 100%;
+  max-width: 680px;
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: help-slide-up 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.help-modal__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg) var(--space-xl);
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.help-modal__title {
+  font-size: var(--font-lead);
+  font-weight: 700;
+  margin: 0;
+  flex: 1;
+}
+
+.help-modal__close {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: var(--radius-md);
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--duration-fast) var(--ease-default),
+              color var(--duration-fast) var(--ease-default);
+}
+
+.help-modal__close:hover {
+  background: var(--panel-soft);
+  color: var(--text);
+}
+
+.help-modal__body {
+  overflow-y: auto;
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  /* Scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-border) transparent;
+}
+
+/* Sektionen */
+.help-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.help-section--legal {
+  background: var(--panel-soft);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  border-left: 3px solid var(--accent-border);
+}
+
+.help-section__title {
+  font-size: var(--font-body);
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--line);
+}
+
+.help-subsection__title {
+  font-size: var(--font-small);
+  font-weight: 700;
+  color: var(--accent);
+  margin: var(--space-sm) 0 var(--space-xs);
+}
+
+.help-section p {
+  font-size: var(--font-small);
+  line-height: 1.65;
+  color: var(--text);
+  margin: 0;
+}
+
+/* Listen */
+.help-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.help-list li {
+  font-size: var(--font-small);
+  line-height: 1.6;
+  padding-left: var(--space-lg);
+  position: relative;
+}
+
+.help-list li::before {
+  content: "•";
+  position: absolute;
+  left: var(--space-sm);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Steuerleiste-Erklärung */
+.help-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+
+.help-control {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
+  font-size: var(--font-small);
+  line-height: 1.5;
+}
+
+.help-control__icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  min-width: 28px;
+  text-align: center;
+}
+
+/* Tastaturkürzel */
+.help-keys {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xs) var(--space-md);
+  margin-top: var(--space-xs);
+}
+
+.help-key {
+  font-size: var(--font-small);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+kbd {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 2px var(--space-xs);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Links */
+.help-link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.help-link:hover {
+  color: var(--text);
+}
+
+/* Footer */
+.help-footer {
+  font-size: var(--font-micro);
+  color: var(--text-dim);
+  text-align: center;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--line);
+  line-height: 1.6;
+}
+
+/* Hilfe-Button auf der Startseite */
+.home-help-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin: var(--space-sm) auto 0;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  font-size: var(--font-small);
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 36px;
+  transition: background var(--duration-fast) var(--ease-default),
+              border-color var(--duration-fast) var(--ease-default);
+}
+
+.home-help-btn:hover {
+  background: var(--accent-light);
+  border-color: var(--accent-border-strong);
+}
+
+/* Animationen */
+@keyframes help-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes help-slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .help-overlay,
+  .help-modal {
+    animation: none;
+  }
+}
+
+/* Compact: Vollbild-Modal auf kleinen Phones */
+@media (max-width: 767px) {
+  .help-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .help-modal {
+    max-width: 100%;
+    max-height: 92dvh;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .help-keys {
+    grid-template-columns: 1fr;
+  }
+}

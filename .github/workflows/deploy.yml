@@ -54,24 +54,23 @@ jobs:
 
       - run: npm ci
 
-      - name: Single-File Build → dist/
-        run: npm run build
-
-      - name: PWA Build → dist-pwa/
+      - name: PWA Build → dist-pwa/ (primäre Erfahrung, deployed at root)
         run: npm run build:pwa
         env:
-          # Base-URL für GitHub Pages: /Mathelab/pwa/
-          VITE_BASE_URL: /Mathelab/pwa/
+          # Base-URL für GitHub Pages: /Mathelab/ (Root, nicht /pwa/)
+          # PWA ist die primäre Erfahrung — Service Worker + installierbar
+          VITE_BASE_URL: /Mathelab/
+
+      - name: Single-File Build → dist/ (Offline-Download)
+        run: npm run build
 
       - name: Ausgaben zusammenführen → _site/
         run: |
-          mkdir -p _site/pwa
-          # Single-File + public assets (manifest.json, icons/, favicon.svg) → Root
-          # cp -r dist/. statt nur dist/index.html — sonst fehlt das Manifest
-          # und iOS kann die App nicht zum Home-Screen hinzufügen.
-          cp -r dist/. _site/
-          # PWA → Unterverzeichnis /pwa/
-          cp -r dist-pwa/. _site/pwa/
+          mkdir -p _site/offline
+          # PWA → Root (primäre GitHub Pages Erfahrung, installierbar)
+          cp -r dist-pwa/. _site/
+          # Single-File → /offline/ (Download für lokale Nutzung ohne Internet)
+          cp dist/index.html _site/offline/index.html
 
       - uses: actions/upload-pages-artifact@v3
         with:

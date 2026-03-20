@@ -108,6 +108,16 @@ function bootstrap(): void {
     }
 
     heroEl.appendChild(diffSelector);
+
+    // Hilfe-Button
+    const helpBtn = document.createElement("button");
+    helpBtn.type = "button";
+    helpBtn.className = "home-help-btn";
+    helpBtn.innerHTML = "❓ Hilfe &amp; Info";
+    helpBtn.addEventListener("click", () => {
+      import("./app/help-overlay").then(({ openHelpOverlay }) => openHelpOverlay());
+    });
+    heroEl.appendChild(helpBtn);
   }
 
   // Füge Home-Karten hinzu
