@@ -141,8 +141,9 @@ function beginRally(timeLimitSec: number): void {
     }
   });
 
-  // Listen for task completions to advance
+  // Listen for task completions to advance (ignore events while paused)
   const taskCleanup = appEvents.on("task:completed", () => {
+    if (getChallengeState().phase !== "running") return;
     rallyIndex++;
     if (rallyIndex >= rallySequence.length) {
       // All modules done!
@@ -153,6 +154,7 @@ function beginRally(timeLimitSec: number): void {
   });
 
   const taskFailCleanup = appEvents.on("task:failed", () => {
+    if (getChallengeState().phase !== "running") return;
     rallyErrors++;
     // On error: still advance to next module (rally is about coverage, not perfection)
     rallyIndex++;

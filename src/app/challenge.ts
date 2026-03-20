@@ -15,7 +15,7 @@ import { appState } from "@core/state";
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export type ChallengeMode = "sprint" | "rally";
-export type ChallengePhase = "idle" | "configuring" | "countdown" | "running" | "finished";
+export type ChallengePhase = "idle" | "configuring" | "countdown" | "running" | "paused" | "finished";
 
 export interface ChallengeConfig {
   mode: ChallengeMode;
@@ -92,9 +92,9 @@ export function getChallengeState(): Readonly<ChallengeState> {
   return _state;
 }
 
-/** Is a challenge currently running? */
+/** Is a challenge currently running (or paused)? */
 export function isChallengeActive(): boolean {
-  return _state.phase === "running" || _state.phase === "countdown";
+  return _state.phase === "running" || _state.phase === "countdown" || _state.phase === "paused";
 }
 
 // Expose on window for synchronous checks from module-framework (avoids async import)
@@ -134,6 +134,25 @@ export function confirmTimeLimit(seconds: number): void {
   }, 1000);
 }
 
+/** Internal: (re)start the RAF timer tick loop */
+function startTimerTick(): void {
+  const tick = (): void => {
+    if (_state.phase !== "running") return;
+    const now = performance.now();
+    _state.elapsed = (now - _state.startTime) / 1000;
+    _state.remaining = Math.max(0, _state.config!.timeLimitSec - _state.elapsed);
+
+    if (_state.remaining <= 0) {
+      finishChallenge();
+      return;
+    }
+
+    emit();
+    _timerRAF = requestAnimationFrame(tick);
+  };
+  _timerRAF = requestAnimationFrame(tick);
+}
+
 /** Internal: start the actual challenge run */
 function beginRunning(): void {
   _state.phase = "running";
@@ -158,22 +177,7 @@ function beginRunning(): void {
     emit();
   });
 
-  // Start timer loop
-  const tick = (): void => {
-    if (_state.phase !== "running") return;
-    const now = performance.now();
-    _state.elapsed = (now - _state.startTime) / 1000;
-    _state.remaining = Math.max(0, _state.config!.timeLimitSec - _state.elapsed);
-
-    if (_state.remaining <= 0) {
-      finishChallenge();
-      return;
-    }
-
-    emit();
-    _timerRAF = requestAnimationFrame(tick);
-  };
-  _timerRAF = requestAnimationFrame(tick);
+  startTimerTick();
 }
 
 /** End the challenge (timer expired or manual stop) */
@@ -204,6 +208,24 @@ export function finishChallenge(): void {
     elapsed: _state.elapsed,
   };
   appState.saveChallengeResult(result);
+}
+
+/** Pause the running challenge — timer freezes, score is preserved */
+export function pauseChallenge(): void {
+  if (_state.phase !== "running") return;
+  // RAF tick stops naturally on next frame (checks phase === "running")
+  _state.phase = "paused";
+  emit();
+}
+
+/** Resume a paused challenge — recalculates startTime to account for pause duration */
+export function resumeChallenge(): void {
+  if (_state.phase !== "paused") return;
+  // Shift startTime forward so elapsed continues from where it was frozen
+  _state.startTime = performance.now() - _state.elapsed * 1000;
+  _state.phase = "running";
+  emit();
+  startTimerTick();
 }
 
 /** Cancel / dismiss an active challenge */

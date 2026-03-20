@@ -11,6 +11,8 @@ import {
   startChallenge,
   confirmTimeLimit,
   cancelChallenge,
+  pauseChallenge,
+  resumeChallenge,
   getBestResult,
   formatTime,
 } from "./challenge";
@@ -23,6 +25,7 @@ let timerBarEl: HTMLElement | null = null;
 let countdownOverlayEl: HTMLElement | null = null;
 let resultOverlayEl: HTMLElement | null = null;
 let configOverlayEl: HTMLElement | null = null;
+let pauseOverlayEl: HTMLElement | null = null;
 let containerEl: HTMLElement | null = null;
 let cleanupFn: (() => void) | null = null;
 
@@ -70,10 +73,12 @@ export function dismissChallengeUI(): void {
   countdownOverlayEl?.remove();
   resultOverlayEl?.remove();
   configOverlayEl?.remove();
+  pauseOverlayEl?.remove();
   timerBarEl = null;
   countdownOverlayEl = null;
   resultOverlayEl = null;
   configOverlayEl = null;
+  pauseOverlayEl = null;
   cleanupFn?.();
   cleanupFn = null;
 }
@@ -91,10 +96,16 @@ function handleStateChange(state: ChallengeState): void {
       break;
     case "running":
       hideCountdown();
+      hidePauseOverlay();
       showTimerBar(state);
+      break;
+    case "paused":
+      showTimerBar(state);
+      showPauseOverlay();
       break;
     case "finished":
       hideTimerBar();
+      hidePauseOverlay();
       showResult(state);
       break;
     case "idle":
@@ -192,10 +203,15 @@ function showTimerBar(state: ChallengeState): void {
     bar.innerHTML = `
       <div class="challenge-timer-fill"></div>
       <div class="challenge-timer-content">
+        <button class="challenge-timer-pause-btn" type="button" aria-label="Pause">⏸</button>
         <span class="challenge-timer-clock">0:00</span>
         <span class="challenge-timer-score">0 ✅</span>
       </div>
     `;
+    bar.querySelector(".challenge-timer-pause-btn")?.addEventListener("click", () => {
+      pauseChallenge();
+      playClickSound();
+    });
     // Insert at top of canvas column
     const canvasCol = containerEl?.querySelector(".v2-canvas-col");
     if (canvasCol) {
@@ -206,7 +222,7 @@ function showTimerBar(state: ChallengeState): void {
     timerBarEl = bar;
   }
 
-  // Update timer
+  // Update timer display
   const fill = timerBarEl.querySelector<HTMLElement>(".challenge-timer-fill");
   const clock = timerBarEl.querySelector(".challenge-timer-clock");
   const score = timerBarEl.querySelector(".challenge-timer-score");
@@ -217,8 +233,57 @@ function showTimerBar(state: ChallengeState): void {
   if (clock) clock.textContent = formatTime(state.remaining);
   if (score) score.textContent = `${state.correct} ✅`;
 
-  // Urgent mode: last 30 seconds
-  timerBarEl.classList.toggle("challenge-timer-bar--urgent", state.remaining <= 30);
+  // Visual state modifiers
+  timerBarEl.classList.toggle("challenge-timer-bar--paused", state.phase === "paused");
+  timerBarEl.classList.toggle("challenge-timer-bar--urgent",
+    state.phase === "running" && state.remaining <= 30);
+}
+
+function showPauseOverlay(): void {
+  if (pauseOverlayEl) return;
+
+  const overlay = document.createElement("div");
+  overlay.className = "challenge-pause-overlay";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-label", "Challenge pausiert");
+
+  const card = document.createElement("div");
+  card.className = "challenge-pause-card";
+  card.innerHTML = `
+    <div class="challenge-pause-icon">⏸</div>
+    <h2 style="margin:0 0 var(--space-xs);font-size:var(--font-lead);">Pause</h2>
+    <p style="margin:0 0 var(--space-lg);color:var(--text-dim);font-size:var(--font-small);">
+      Zeit gestoppt – mach weiter, wenn du bereit bist.
+    </p>
+    <div style="display:flex;flex-direction:column;gap:var(--space-sm);">
+      <button type="button" class="challenge-result-btn challenge-result-btn--primary challenge-resume-btn">
+        ⏯ Weitermachen
+      </button>
+      <button type="button" class="challenge-result-btn challenge-result-btn--secondary challenge-abort-btn">
+        ✖ Challenge beenden
+      </button>
+    </div>
+  `;
+
+  card.querySelector(".challenge-resume-btn")?.addEventListener("click", () => {
+    playClickSound();
+    resumeChallenge();
+  });
+
+  card.querySelector(".challenge-abort-btn")?.addEventListener("click", () => {
+    playClickSound();
+    cancelChallenge();
+  });
+
+  overlay.appendChild(card);
+  containerEl?.appendChild(overlay);
+  pauseOverlayEl = overlay;
+}
+
+function hidePauseOverlay(): void {
+  pauseOverlayEl?.remove();
+  pauseOverlayEl = null;
 }
 
 function hideTimerBar(): void {

@@ -12,6 +12,8 @@ import {
   confirmTimeLimit,
   finishChallenge,
   cancelChallenge,
+  pauseChallenge,
+  resumeChallenge,
   isChallengeActive,
   getBestResult,
   formatTime,
@@ -128,6 +130,76 @@ describe("Challenge State Machine", () => {
     startChallenge({ mode: "sprint", moduleId: "test", taskType: "basic" });
     finishChallenge(); // configuring phase
     expect(getChallengeState().phase).toBe("configuring");
+  });
+});
+
+describe("Challenge Pause / Resume", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    cancelChallenge();
+  });
+
+  afterEach(() => {
+    cancelChallenge();
+    vi.useRealTimers();
+  });
+
+  function startRunning(): void {
+    startChallenge({ mode: "sprint", moduleId: "test", taskType: "basic" });
+    confirmTimeLimit(120);
+    vi.advanceTimersByTime(3000); // countdown 3-2-1 → running
+  }
+
+  it("pauseChallenge transitions running → paused", () => {
+    startRunning();
+    expect(getChallengeState().phase).toBe("running");
+
+    pauseChallenge();
+    expect(getChallengeState().phase).toBe("paused");
+  });
+
+  it("isChallengeActive returns true when paused", () => {
+    startRunning();
+    pauseChallenge();
+    expect(isChallengeActive()).toBe(true);
+  });
+
+  it("resumeChallenge transitions paused → running", () => {
+    startRunning();
+    pauseChallenge();
+    resumeChallenge();
+    expect(getChallengeState().phase).toBe("running");
+  });
+
+  it("pauseChallenge is a no-op when not running", () => {
+    startChallenge({ mode: "sprint", moduleId: "test", taskType: "basic" });
+    pauseChallenge(); // configuring phase
+    expect(getChallengeState().phase).toBe("configuring");
+  });
+
+  it("resumeChallenge is a no-op when not paused", () => {
+    startRunning();
+    resumeChallenge(); // already running
+    expect(getChallengeState().phase).toBe("running");
+  });
+
+  it("cancelChallenge from paused resets to idle", () => {
+    startRunning();
+    pauseChallenge();
+    cancelChallenge();
+    expect(getChallengeState().phase).toBe("idle");
+    expect(isChallengeActive()).toBe(false);
+  });
+
+  it("elapsed is preserved across pause/resume", () => {
+    startRunning();
+    // Elapsed tracked via performance.now() which fake timers don't advance automatically
+    // Just verify the phase transitions are correct
+    pauseChallenge();
+    const elapsedAtPause = getChallengeState().elapsed;
+    resumeChallenge();
+    // After immediate resume, elapsed should not have jumped backwards
+    expect(getChallengeState().elapsed).toBeGreaterThanOrEqual(elapsedAtPause);
   });
 });
 
