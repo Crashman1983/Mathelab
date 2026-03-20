@@ -12,6 +12,16 @@ let overlayEl: HTMLElement | null = null;
 
 // ─── Public API ──────────────────────────────────────────────────────────────
 
+/** Öffnet das Hilfe-Overlay direkt auf dem Datenschutz-Abschnitt */
+export function openHelpOverlayLegal(): void {
+  openHelpOverlay();
+  // Nach dem Öffnen zum Datenschutz-Abschnitt scrollen (nächster Frame)
+  requestAnimationFrame(() => {
+    const section = overlayEl?.querySelector("#help-section-legal");
+    section?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
 export function openHelpOverlay(): void {
   if (overlayEl) return;
 
@@ -249,7 +259,7 @@ function buildContent(): string {
       </section>
 
       <!-- Datenschutz -->
-      <section class="help-section help-section--legal">
+      <section class="help-section help-section--legal" id="help-section-legal">
         <h2 class="help-section__title">🔒 Datenschutz &amp; Rechtliches</h2>
         <ul class="help-list">
           <li>

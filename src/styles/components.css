@@ -2911,3 +2911,35 @@ kbd {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Home Footer ─────────────────────────────────────────── */
+
+.home-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg) var(--space-md) var(--space-xl);
+  margin-top: var(--space-md);
+}
+
+.home-footer__sep {
+  color: var(--text-dim);
+  font-size: var(--font-small);
+  opacity: 0.5;
+}
+
+.home-footer__link {
+  font-size: var(--font-small);
+  color: var(--text-dim);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: 44px;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  transition: color var(--duration-fast) var(--ease-default);
+}
+
+.home-footer__link:hover {
+  color: var(--text);
+}

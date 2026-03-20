@@ -161,6 +161,25 @@ function bootstrap(): void {
     cardsContainer.appendChild(challengeCard);
   }
 
+  // Home-Fußleiste
+  const homeView = document.querySelector(".home-view");
+  if (homeView) {
+    const footer = document.createElement("footer");
+    footer.className = "home-footer";
+    footer.innerHTML = `
+      <button type="button" class="home-footer__link" id="home-footer-help">❓ Hilfe &amp; Info</button>
+      <span class="home-footer__sep" aria-hidden="true">·</span>
+      <button type="button" class="home-footer__link" id="home-footer-legal">🔒 Datenschutz &amp; Rechtliches</button>
+    `;
+    footer.querySelector("#home-footer-help")?.addEventListener("click", () => {
+      import("./app/help-overlay").then(({ openHelpOverlay }) => openHelpOverlay());
+    });
+    footer.querySelector("#home-footer-legal")?.addEventListener("click", () => {
+      import("./app/help-overlay").then(({ openHelpOverlayLegal }) => openHelpOverlayLegal());
+    });
+    homeView.appendChild(footer);
+  }
+
   // Home-Button verknüpfen
   document.getElementById("nav-home")?.addEventListener("click", () => {
     shell.showHome();
